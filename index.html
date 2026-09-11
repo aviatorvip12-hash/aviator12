@@ -835,7 +835,7 @@
     <div class="page-screen" id="color-gems-screen">
       <div class="cg-container" id="cgGameContainer">
         <button class="cg-fs" id="cg-fs-btn" onclick="toggleCgFullScreen()">📱 ফুলস্ক্রিন করুন</button>
-        <div class="cg-top"><div class="cg-ways">2000 WAYS</div><div class="cg-mults" id="cg-mults"><span class="active">1X</span><span>2X</span><span>3X</span><span>4X</span><span>5X</span></div></div>
+        <div class="cg-top"><div class="cg-ways">2000 WAYS</div><div class="cg-mults" id="cg-mults"><span class="active">1X</span><span>2X</span><span>3X</span><span>5X</span></div></div>
         <div class="cg-frame"><div class="cg-reels" id="cg-board"></div></div>
         <div class="cg-actions"><button class="cg-action" id="cg-extra-btn">⚡ Extra Bet</button><button class="cg-action buy" id="cg-buy-btn">💎 Buy Feature</button></div>
         <div class="cg-info"><div class="cg-box"><div class="cg-label">ব্যালেন্স</div><div class="cg-value" id="cg-bal">0.00</div></div><div class="cg-box"><div class="cg-label">উইন</div><div class="cg-value" id="cg-win">0.00</div></div><div class="cg-box"><div class="cg-label">মোট বেট</div><div class="cg-value" id="cg-bet">1.00</div></div></div>
@@ -2041,7 +2041,9 @@
         let CG_BET_OPTIONS=[1,2,3,5,10],cgBetIndex=0,cgSpinning=false,cgAuto=false,cgAutoTimer=null,cgBoardState=Array(25).fill(''),cgWin=0,cgMultiplierIndex=0;
         /* Color Gems multiplier sequence follows Boxing King's 1X → 2X → 3X → 5X. */
         const CG_MULTS=[1,2,3,5];
-        const CG_DEMO_WIN_RATE=0.20; // virtual/demo presentation only; not suitable for real-money wagering
+        /* Color Gems uses the same cascade/stop principle as Boxing King.
+           No artificial win-rate/forced-win result is used. A spin only wins when
+           a valid same-symbol path starts in column 1 and reaches column 3. */
         const cgBoard=document.getElementById('cg-board');
         function cgFmt(n){return (Math.round((Number(n||0)+Number.EPSILON)*100)/100).toFixed(2)}
         function cgRand(){return CG_ITEMS[Math.floor(Math.random()*CG_ITEMS.length)]}
@@ -2066,45 +2068,62 @@
         function cgFindMatches(){
             const winners=new Set();
             const paths=[];
+
+            /* Same left-to-right matching idea used by Boxing King:
+               a symbol must begin in column 1 and connect through columns
+               2 and 3. Adjacent rows may move -1 / 0 / +1. */
             for(const sym of CG_ITEMS){
+                let currentColumnNodes=[];
                 for(let r=0;r<5;r++){
-                    const first=cgGet(r,0);
-                    if(first!==sym) continue;
-                    const states=[{row:r,indices:[cgIdx(r,0)]}];
-                    for(let col=1;col<3;col++){
-                        const next=[];
-                        for(const st of states){
-                            for(const nr of [st.row-1,st.row,st.row+1]){
-                                if(nr<0||nr>4) continue;
-                                if(cgGet(nr,col)===sym) next.push({row:nr,indices:st.indices.concat(cgIdx(nr,col))});
+                    const idx=cgIdx(r,0);
+                    if(cgBoardState[idx]===sym){
+                        currentColumnNodes.push({row:r,col:0,index:idx});
+                    }
+                }
+                if(!currentColumnNodes.length) continue;
+
+                let colIndex=0;
+                const connectedIndices=new Set();
+                let maxColumnReached=-1;
+
+                while(currentColumnNodes.length>0 && colIndex<5){
+                    maxColumnReached=colIndex;
+                    currentColumnNodes.forEach(n=>connectedIndices.add(n.index));
+                    if(colIndex===4) break;
+
+                    const nextColumnIndex=colIndex+1;
+                    const nextColumnNodes=[];
+                    const nextColVisited=new Set();
+
+                    currentColumnNodes.forEach(currentNode=>{
+                        for(const nr of [currentNode.row-1,currentNode.row,currentNode.row+1]){
+                            if(nr<0||nr>=5) continue;
+                            const nextIdx=cgIdx(nr,nextColumnIndex);
+                            if(cgBoardState[nextIdx]===sym && !nextColVisited.has(nextIdx)){
+                                nextColVisited.add(nextIdx);
+                                nextColumnNodes.push({row:nr,col:nextColumnIndex,index:nextIdx});
                             }
                         }
-                        states.splice(0,states.length,...next);
-                        if(!states.length) break;
-                    }
-                    states.forEach(st=>{if(st.indices.length>=3){st.indices.forEach(i=>winners.add(i));paths.push(st.indices)}});
+                    });
+
+                    currentColumnNodes=nextColumnNodes;
+                    colIndex++;
+                }
+
+                if(maxColumnReached>=2){
+                    connectedIndices.forEach(i=>winners.add(i));
+                    paths.push([...connectedIndices]);
                 }
             }
+
             return {indices:[...winners],paths};
         }
 
-        function cgGenerateBoard(forceWin){
-            let guard=0;
-            do{
-                for(let i=0;i<25;i++)cgBoardState[i]=cgRand();
-                if(forceWin){
-                    const sym=cgRand();
-                    let r=Math.floor(Math.random()*5);
-                    /* Guarantee a 3-column path beginning at column 1. */
-                    cgBoardState[cgIdx(r,0)]=sym;
-                    let r2=Math.max(0,Math.min(4,r+Math.floor(Math.random()*3)-1));
-                    let r3=Math.max(0,Math.min(4,r2+Math.floor(Math.random()*3)-1));
-                    cgBoardState[cgIdx(r2,1)]=sym;
-                    cgBoardState[cgIdx(r3,2)]=sym;
-                }
-                guard++;
-                if(forceWin || !cgFindMatches().indices.length) break;
-            }while(guard<80);
+        function cgGenerateBoard(){
+            /* Pure random board. Unlike the old version, this does not force a
+               winning result. The cascade evaluator decides whether the spin
+               wins or stops, exactly from the symbols that landed. */
+            for(let i=0;i<25;i++) cgBoardState[i]=cgRand();
             cgRenderBoard();
         }
 
@@ -2167,9 +2186,9 @@
                 if(ticks>=10){
                     clearInterval(timer);
                     cells.forEach(c=>c.classList.remove('rolling'));
-                    /* For the virtual/demo version, most spins are intentionally non-winning. */
-                    const forceWin=cgConfig.testMode ? true : (Math.random()<CG_DEMO_WIN_RATE);
-                    cgGenerateBoard(forceWin);
+                    /* Boxing King-style stop: the actual landed symbols decide
+                       whether a valid cascade starts. No forced win is injected. */
+                    cgGenerateBoard();
                     setTimeout(()=>{
                         cgCascade(activeBet,1,0,totalWin=>finishCgSpin(activeBet,totalWin));
                     },250);
