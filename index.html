@@ -666,7 +666,7 @@
         <div class="av-glass-card av-modal">
             <h2>➕ কয়েন ডিপোজিট</h2>
             <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:10px;" id="admin-deposit-instruction">
-                এডমিন নম্বর: <strong id="admin-bkash-num" style="color:#ffcc00;">লোড হচ্ছে...</strong><br>
+                <span id="deposit-payment-label">বিকাশ নম্বর:</span> <strong id="admin-bkash-num" style="color:#ffcc00;">লোড হচ্ছে...</strong><br>
                 টাকা পাঠিয়ে নিচের তথ্যগুলো দিন:
             </div>
             <div class="form-group">
@@ -1008,11 +1008,45 @@
             }
         });
 
+        // LIVE Deposit payment numbers — kept compatible with the original User panel.
+        // Admin can control bKash and Nagad separately from Firebase.
+        const depositPaymentNumbers = { bkash: '', nagad: '' };
+        const depositMethodEl = document.getElementById('deposit-method');
+        const depositPaymentLabelEl = document.getElementById('deposit-payment-label');
+        const depositPaymentNumberEl = document.getElementById('admin-bkash-num');
+
+        function updateDepositPaymentUI() {
+            const method = depositMethodEl ? depositMethodEl.value : 'bkash';
+            const number = String(depositPaymentNumbers[method] || '').trim();
+            if (depositPaymentLabelEl) {
+                depositPaymentLabelEl.innerText = method === 'nagad' ? 'নগদ নম্বর:' : 'বিকাশ নম্বর:';
+            }
+            if (depositPaymentNumberEl) {
+                depositPaymentNumberEl.innerText = number || 'নম্বর সেট করা হয়নি';
+                depositPaymentNumberEl.style.color = number ? '#ffcc00' : '#ef9a9a';
+            }
+        }
+
+        function watchDepositPaymentNumber(path, key) {
+            db.ref(path).on('value', function(snapshot) {
+                depositPaymentNumbers[key] = String(snapshot.val() || '');
+                updateDepositPaymentUI();
+            });
+        }
+
+        watchDepositPaymentNumber('adminSettings/paymentNumberBkash', 'bkash');
+        watchDepositPaymentNumber('adminSettings/paymentNumberNagad', 'nagad');
+
+        // Backward compatibility: if an older Admin still uses the single paymentNumber path,
+        // use it as a fallback without changing the newer separate bKash/Nagad values.
         db.ref('adminSettings/paymentNumber').on('value', function(snapshot) {
-            const num = snapshot.val() || "01700000000 (বিকাশ/নগদ)";
-            const numEl = document.getElementById('admin-bkash-num');
-            if(numEl) numEl.innerText = num;
+            const legacy = String(snapshot.val() || '').trim();
+            if (!depositPaymentNumbers.bkash && legacy) depositPaymentNumbers.bkash = legacy;
+            if (!depositPaymentNumbers.nagad && legacy) depositPaymentNumbers.nagad = legacy;
+            updateDepositPaymentUI();
         });
+
+        if (depositMethodEl) depositMethodEl.addEventListener('change', updateDepositPaymentUI);
 
         const depositModal = document.getElementById('deposit-modal');
         const withdrawModal = document.getElementById('withdraw-modal');
@@ -1033,6 +1067,13 @@
             const amt = parseFloat(document.getElementById('deposit-amount').value);
             const method = document.getElementById('deposit-method').value;
             const trxId = document.getElementById('deposit-trxid').value.trim();
+            const paymentNumber = (depositPaymentNumbers[method] || '').trim();
+
+            if (!paymentNumber) {
+                depositMsg.style.color = "#ef9a9a";
+                depositMsg.innerText = method === 'nagad' ? "নগদ ডিপোজিট বর্তমানে বন্ধ আছে।" : "বিকাশ ডিপোজিট বর্তমানে বন্ধ আছে।";
+                return;
+            }
 
             if (isNaN(amt) || amt <= 0) {
                 depositMsg.style.color = "#ef9a9a";
@@ -1265,7 +1306,7 @@
                         updateSharedBalanceUI();
                     } else {
                         db.ref('users/' + user.uid).update({
-                            email: user.email, balance: 000, games: 0, wins: 0,
+                            email: user.email, balance: 0, games: 0, wins: 0,
                             boxingKingGames: 0, boxingKingWins: 0
                         });
                     }
