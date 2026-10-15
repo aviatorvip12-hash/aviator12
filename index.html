@@ -1478,15 +1478,17 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         let lastCrashSettlementAttempt = -1;
         let aviatorBetsListener = null;
 
-        // Aviator uses Firebase server time so every device derives the same round/crash point.
-        // This prevents one phone from being a few seconds ahead/behind because of local clock drift.
+        // Aviator uses Firebase server time and does not start until the clock offset is received.
+        // Every frame derives elapsed flight time from the shared roundStartAt timestamp, not frame count.
         let aviatorServerTimeOffset = 0;
+        let aviatorServerTimeOffsetReady = false;
         let aviatorFirebaseConnected = false;
         let aviatorLoopRunning = false;
 
-        // Do not let cached/local JavaScript keep Aviator running without a live Firebase connection.
+        // Do not start a round or animate until Firebase's server-clock offset has arrived.
+        // This prevents devices with different local clock settings from starting at different points.
         function isAviatorOnline() {
-            return navigator.onLine !== false && aviatorFirebaseConnected === true;
+            return navigator.onLine !== false && aviatorFirebaseConnected === true && aviatorServerTimeOffsetReady === true;
         }
         function setAviatorConnectionUI(online) {
             let overlay = document.getElementById('aviator-offline-overlay');
@@ -1517,14 +1519,27 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         }
         window.addEventListener('offline', stopAviatorLoopForOffline);
         window.addEventListener('online', startAviatorLoopIfOnline);
+        function activateAviatorAfterClockSync() {
+            if (!aviatorFirebaseConnected || navigator.onLine === false || !aviatorServerTimeOffsetReady) {
+                stopAviatorLoopForOffline();
+                return;
+            }
+            // Attach the shared-round listener once; Firebase automatically reconnects it.
+            if (!aviatorRoundStateListener) watchAviatorRoundState();
+            startAviatorLoopIfOnline();
+        }
         db.ref('.info/connected').on('value', function(snapshot) {
             aviatorFirebaseConnected = snapshot.val() === true;
-            if (aviatorFirebaseConnected && navigator.onLine !== false) { watchAviatorRoundState(); startAviatorLoopIfOnline(); }
+            if (aviatorFirebaseConnected && navigator.onLine !== false) activateAviatorAfterClockSync();
             else stopAviatorLoopForOffline();
         });
         db.ref('.info/serverTimeOffset').on('value', function(snapshot) {
             const v = Number(snapshot.val());
-            aviatorServerTimeOffset = Number.isFinite(v) ? v : 0;
+            if (Number.isFinite(v)) {
+                aviatorServerTimeOffset = v;
+                aviatorServerTimeOffsetReady = true;
+                activateAviatorAfterClockSync();
+            }
         });
         function getAviatorServerNow() {
             return Date.now() + aviatorServerTimeOffset;
