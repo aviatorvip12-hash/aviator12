@@ -288,6 +288,26 @@
             transform: scale(0.92);
         }
 
+        /* Lobby announcement ticker inspired by the supplied reference image. */
+        .gz-lobby-announcement {
+            display:flex; align-items:center; gap:10px; width:calc(100% - 20px);
+            margin:8px 10px 10px; min-height:46px; box-sizing:border-box;
+            padding:0 12px; overflow:hidden; border-radius:12px;
+            background:linear-gradient(180deg,#003b42,#002d35);
+            border:1px solid rgba(50,205,190,.28);
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 3px 9px rgba(0,0,0,.16);
+        }
+        .gz-lobby-announcement.hidden { display:none !important; }
+        .gz-lobby-announcement-icon { flex:0 0 auto; font-size:23px; line-height:1; }
+        .gz-lobby-announcement-window { flex:1; min-width:0; overflow:hidden; white-space:nowrap; }
+        .gz-lobby-announcement-text {
+            display:inline-block; min-width:max-content; padding-left:100%;
+            color:#e8c47b; font-size:clamp(13px,3.5vw,17px); font-weight:700;
+            line-height:1.35; animation:gzAnnouncementScroll 20s linear infinite;
+        }
+        @keyframes gzAnnouncementScroll { from { transform:translateX(0); } to { transform:translateX(-100%); } }
+        @media (prefers-reduced-motion: reduce) { .gz-lobby-announcement-text { animation:none; padding-left:0; white-space:normal; min-width:0; } }
+
         .global-announce-bar {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -1101,6 +1121,11 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             </div>
         </header>
 
+        <div class="gz-lobby-announcement hidden" id="gz-lobby-announcement" role="status" aria-label="Announcement">
+          <span class="gz-lobby-announcement-icon" aria-hidden="true">📣</span>
+          <div class="gz-lobby-announcement-window"><span class="gz-lobby-announcement-text" id="gz-lobby-announcement-text">✨ Gaming Zone-এ স্বাগতম!</span></div>
+        </div>
+
         <section class="gz-promo-carousel" id="gz-promo-carousel" aria-label="Gaming Zone rotating banners">
           <div class="gz-promo-slide active">
             <div class="gz-promo-copy"><small>🎁 DAILY PROMOTION</small><h2>PLAY & WIN</h2><p>Gaming Zone-এর নতুন আপডেট দেখুন</p><span>WELCOME GAMER ›</span></div><div class="gz-promo-art">🎁</div>
@@ -1395,6 +1420,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         function openGameScreen(screenId) {
             document.querySelectorAll('.page-screen').forEach(scr => scr.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
+            if (typeof updateAnnouncementBars === 'function') updateAnnouncementBars();
             document.getElementById('global-back-btn').classList.remove('hidden');
             // Hide (do not remove) the lobby navigation only while inside a game.
             document.querySelector('.gz-bottom-nav')?.classList.add('game-hidden');
@@ -1409,6 +1435,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         function openLobby() {
             document.querySelectorAll('.page-screen').forEach(scr => scr.classList.remove('active'));
             document.getElementById('lobby-screen').classList.add('active');
+            if (typeof updateAnnouncementBars === 'function') updateAnnouncementBars();
             document.getElementById('global-back-btn').classList.add('hidden');
             // Restore Home/Invite/Member navigation in the lobby.
             document.querySelector('.gz-bottom-nav')?.classList.remove('game-hidden');
@@ -1596,16 +1623,30 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         const userEmailDisplay = document.getElementById('user-email-display');
 
         const announceBar = document.getElementById('global-announce-bar');
-        db.ref('adminSettings/announcement').on('value', function(snapshot) {
-            const text = snapshot.val();
-            if (text && text.trim() !== "") {
-                announceBar.innerText = "📢 " + text;
-                announceBar.classList.remove('hidden');
-                document.body.classList.add('announce-visible');
-            } else {
-                announceBar.classList.add('hidden');
-                document.body.classList.remove('announce-visible');
+        const lobbyAnnounceBar = document.getElementById('gz-lobby-announcement');
+        const lobbyAnnounceText = document.getElementById('gz-lobby-announcement-text');
+        let currentAnnouncementText = '';
+        function updateAnnouncementBars() {
+            const message = String(currentAnnouncementText || '').trim();
+            const hasMessage = message.length > 0;
+            const lobbyIsActive = !!document.getElementById('lobby-screen')?.classList.contains('active');
+            if (lobbyAnnounceText && hasMessage) {
+                lobbyAnnounceText.textContent = '✨ ' + message;
+                // Restart the ticker animation when the admin changes the message.
+                lobbyAnnounceText.style.animation = 'none';
+                void lobbyAnnounceText.offsetWidth;
+                lobbyAnnounceText.style.animation = '';
             }
+            if (lobbyAnnounceBar) lobbyAnnounceBar.classList.toggle('hidden', !hasMessage || !lobbyIsActive);
+            if (announceBar) {
+                announceBar.textContent = hasMessage ? '📢 ' + message : '';
+                announceBar.classList.toggle('hidden', !hasMessage || lobbyIsActive);
+            }
+            document.body.classList.toggle('announce-visible', hasMessage && !lobbyIsActive);
+        }
+        db.ref('adminSettings/announcement').on('value', function(snapshot) {
+            currentAnnouncementText = String(snapshot.val() || '').trim();
+            updateAnnouncementBars();
         });
 
         // LIVE Deposit payment numbers — kept compatible with the original User panel.
