@@ -396,7 +396,8 @@
             border-radius: 8px; overflow: hidden; display: flex; justify-content: center; align-items: center; flex-shrink: 0;
         }
 
-        .av-game-balance { position:absolute; top:8px; right:8px; z-index:12; padding:5px 8px; border-radius:8px; background:rgba(0,0,0,.72); border:1px solid rgba(129,199,132,.75); color:#81c784; font-size:.75rem; font-weight:800; pointer-events:none; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+        .av-game-balance-row { display:flex; justify-content:flex-end; align-items:center; width:100%; min-height:26px; margin:0 0 5px; flex-shrink:0; }
+        .av-game-balance { position:static; z-index:12; padding:5px 8px; border-radius:8px; background:rgba(0,0,0,.72); border:1px solid rgba(129,199,132,.75); color:#81c784; font-size:.75rem; font-weight:800; pointer-events:none; box-shadow:0 2px 8px rgba(0,0,0,.25); }
         #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         .av-multiplier-text { font-size: 2.2rem; font-weight: 900; z-index: 2; text-shadow: 0 0 20px rgba(0, 0, 0, 0.9); text-align: center; }
         .av-multiplier-text.crashed { color: var(--accent-red); }
@@ -1140,7 +1141,10 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
     <div class="page-screen" id="aviator-game-screen">
         <header class="av-header">
             <div class="av-logo">✈️ AVIATOR PRO</div>
-            <button class="av-btn" id="av-fs-btn" onclick="toggleAviatorFullScreen()" style="padding: 3px 10px; font-size: 0.65rem; background: #0088cc;">📱 ফুলস্ক্রিন</button>
+            <div class="av-header-actions" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <div class="av-game-balance" aria-label="বর্তমান ব্যালেন্স" style="padding:4px 7px;font-size:.7rem;white-space:nowrap;">🪙 <span id="av-game-balance-amount">0.00</span></div>
+                <button class="av-btn" id="av-fs-btn" onclick="toggleAviatorFullScreen()" style="padding: 3px 10px; font-size: 0.65rem; background: #0088cc;white-space:nowrap;">📱 ফুলস্ক্রিন</button>
+            </div>
         </header>
 
         <div class="av-container">
@@ -1149,7 +1153,6 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 <div id="cashout-banner-container"></div>
                 <div class="av-game-display">
                     <canvas id="game-canvas"></canvas>
-                    <div class="av-game-balance" aria-label="বর্তমান ব্যালেন্স">🪙 <span id="av-game-balance-amount">0.00</span></div>
                     <div class="av-multiplier-text" id="multiplier-display">WAITING...</div>
                 </div>
                 <div class="av-controls-panel">
