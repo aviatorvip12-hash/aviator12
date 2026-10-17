@@ -4110,19 +4110,64 @@ function rbLockAndSpin(){
 </div>
 
 
-    <!-- PRIVATE HELP CENTER -->
+    <!-- PRIVATE HELP CENTER — Update 31 professional chat UI -->
+    <style>
+      #help-center-modal .gz-help-modal{width:min(100%,460px);max-height:min(88vh,760px);display:flex;flex-direction:column;overflow:hidden;padding:0!important;border:1px solid rgba(61,235,198,.38);border-radius:22px;background:linear-gradient(155deg,rgba(5,48,57,.98),rgba(3,23,38,.99));box-shadow:0 24px 70px rgba(0,0,0,.48)}
+      #help-center-modal .gz-help-head{display:flex;align-items:center;gap:12px;padding:17px 16px 14px;border-bottom:1px solid rgba(255,255,255,.09);background:linear-gradient(110deg,rgba(22,130,112,.2),rgba(0,0,0,.05))}
+      #help-center-modal .gz-help-icon{width:44px;height:44px;display:grid;place-items:center;flex-shrink:0;border-radius:15px;background:rgba(47,232,190,.13);border:1px solid rgba(47,232,190,.25);font-size:23px}
+      #help-center-modal .gz-help-title{margin:0;color:#eafff8;font-size:19px;font-weight:900;letter-spacing:.2px}
+      #help-center-modal .gz-help-subtitle{margin:4px 0 0;color:#a7c9c7;font-size:11px;line-height:1.45}
+      #help-center-modal .gz-help-close{margin-left:auto;align-self:flex-start;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#eafaf7;border-radius:10px;width:34px;height:34px;font-size:18px;cursor:pointer}
+      #help-center-modal .gz-help-legend{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px 2px}
+      #help-center-modal .gz-help-key{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;font-size:10px;color:#dcece9;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}
+      #help-center-modal .gz-help-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+      #help-center-modal #help-chat-list{height:clamp(220px,42vh,430px);min-height:190px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:14px 12px;background:rgba(0,0,0,.12);scroll-behavior:smooth;overscroll-behavior:contain}
+      #help-center-modal .gz-help-empty{margin:auto;text-align:center;max-width:250px;padding:28px 12px;color:#a9c3c2;font-size:12px;line-height:1.7}
+      #help-center-modal .gz-help-empty-icon{font-size:32px;margin-bottom:9px}
+      #help-center-modal .gz-help-row{display:flex;flex-direction:column;max-width:88%;gap:4px;animation:gzHelpIn .18s ease-out}
+      #help-center-modal .gz-help-row.user{align-self:flex-end;align-items:flex-end}
+      #help-center-modal .gz-help-row.admin{align-self:flex-start;align-items:flex-start}
+      #help-center-modal .gz-help-sender{display:flex;align-items:center;gap:5px;color:#b8cece;font-size:10px;font-weight:800;padding:0 4px}
+      #help-center-modal .gz-help-role-icon{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:7px;font-size:10px}
+      #help-center-modal .gz-help-row.user .gz-help-role-icon{background:rgba(55,167,255,.18);color:#9bd8ff}
+      #help-center-modal .gz-help-row.admin .gz-help-role-icon{background:rgba(49,230,181,.15);color:#71f2cc}
+      #help-center-modal .gz-help-bubble{padding:10px 12px;border-radius:15px;font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;color:#f1fbfa;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+      #help-center-modal .gz-help-row.user .gz-help-bubble{border:1px solid rgba(68,169,255,.3);border-bottom-right-radius:5px;background:linear-gradient(145deg,rgba(24,104,165,.48),rgba(20,77,120,.38))}
+      #help-center-modal .gz-help-row.admin .gz-help-bubble{border:1px solid rgba(53,225,183,.23);border-bottom-left-radius:5px;background:linear-gradient(145deg,rgba(13,103,86,.43),rgba(8,68,68,.42))}
+      #help-center-modal .gz-help-time{padding:0 4px;color:#8da9aa;font-size:9px}
+      #help-center-modal .gz-help-compose{padding:12px;border-top:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.13)}
+      #help-center-modal .gz-help-compose-row{display:flex;align-items:center;gap:8px}
+      #help-center-modal #help-chat-input{flex:1;min-width:0;height:43px;padding:0 13px;border-radius:13px;border:1px solid rgba(112,207,193,.25);background:rgba(0,0,0,.22);color:#f3fffc;font-size:13px;outline:none}
+      #help-center-modal #help-chat-input:focus{border-color:#39dfba;box-shadow:0 0 0 3px rgba(57,223,186,.09)}
+      #help-center-modal #help-chat-send{height:43px;min-width:76px;border-radius:13px;font-weight:900}
+      #help-center-modal .gz-help-footnote{margin:8px 2px 0;color:#89aaa9;font-size:10px;line-height:1.45}
+      @keyframes gzHelpIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+      @media(max-width:480px){#help-center-modal .gz-help-modal{width:100%;max-height:90vh;border-radius:20px}#help-center-modal .gz-help-row{max-width:93%}#help-center-modal #help-chat-list{height:clamp(220px,43vh,430px)}}
+    </style>
     <div class="av-modal-overlay hidden" id="help-center-modal">
-        <div class="av-glass-card av-modal" style="max-width:430px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-                <h2 style="margin:0;">🆘 Help Center</h2>
-                <button type="button" id="close-help-center-btn" class="av-btn av-btn-logout" style="padding:6px 10px;">✕</button>
+        <div class="av-glass-card av-modal gz-help-modal" role="dialog" aria-modal="true" aria-labelledby="gz-help-title">
+            <div class="gz-help-head">
+                <div class="gz-help-icon">🆘</div>
+                <div style="min-width:0;flex:1;">
+                    <h2 class="gz-help-title" id="gz-help-title">Help Center</h2>
+                    <p class="gz-help-subtitle">আপনার সমস্যা বা প্রশ্ন সরাসরি Support Team-কে জানান</p>
+                </div>
+                <button type="button" id="close-help-center-btn" class="gz-help-close" aria-label="Help Center বন্ধ করুন">×</button>
             </div>
-            <div style="font-size:.72rem;color:var(--text-dim);margin:8px 0 10px;">এটি আপনার ব্যক্তিগত Support Chat। অন্য কোনো user এই conversation দেখতে পারবে না।</div>
-            <div id="help-chat-list" style="height:280px;overflow:auto;display:flex;flex-direction:column;gap:7px;padding:8px;background:rgba(0,0,0,.18);border-radius:12px;"></div>
-            <div class="av-error-msg" id="help-chat-msg" style="margin-top:7px;"></div>
-            <div style="display:flex;gap:6px;margin-top:8px;">
-                <input type="text" id="help-chat-input" maxlength="500" placeholder="আপনার সমস্যা লিখুন..." style="flex:1;min-width:0;">
-                <button type="button" id="help-chat-send" class="av-btn av-btn-deposit" style="padding:8px 12px;">Send</button>
+            <div class="gz-help-legend" aria-label="Message পরিচিতি">
+                <span class="gz-help-key"><i class="gz-help-dot" style="background:#55baff"></i> নীল: আপনার মেসেজ</span>
+                <span class="gz-help-key"><i class="gz-help-dot" style="background:#39e5b7"></i> সবুজ: অ্যাডমিনের রিপ্লাই</span>
+            </div>
+            <div id="help-chat-list" role="log" aria-live="polite" aria-label="Support conversation">
+                <div class="gz-help-empty"><div class="gz-help-empty-icon">💬</div>আপনার Support conversation এখানে দেখা যাবে। সাহায্য পেতে নিচে মেসেজ লিখুন।</div>
+            </div>
+            <div class="gz-help-compose">
+                <div class="gz-help-compose-row">
+                    <input type="text" id="help-chat-input" maxlength="500" placeholder="আপনার সমস্যা লিখুন…" aria-label="আপনার মেসেজ" autocomplete="off">
+                    <button type="button" id="help-chat-send" class="av-btn av-btn-deposit">পাঠান ➤</button>
+                </div>
+                <div class="gz-help-footnote">🔒 এই কথোপকথনটি আপনার অ্যাকাউন্টের ব্যক্তিগত Support Chat। সর্বোচ্চ ৫০০ অক্ষর লিখতে পারবেন।</div>
+                <div class="av-error-msg" id="help-chat-msg" role="status" aria-live="polite" style="margin-top:6px;"></div>
             </div>
         </div>
     </div>
@@ -4138,10 +4183,22 @@ function rbLockAndSpin(){
   const status=document.getElementById('help-chat-msg');
   let chatListener=null;
   function esc(v){return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}
+  function formatTime(value){
+    const n=Number(value||0); if(!n) return 'সময় পাওয়া যায়নি';
+    try{return new Intl.DateTimeFormat('bn-BD',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}).format(new Date(n));}
+    catch(e){return new Date(n).toLocaleString();}
+  }
   function render(snap){
     const data=snap.val()||{};
     const rows=Object.entries(data).sort((a,b)=>Number(a[1]?.timestamp||0)-Number(b[1]?.timestamp||0));
-    list.innerHTML=rows.length?rows.map(([id,m])=>`<div style="align-self:${m.senderUid===currentUser?.uid?'flex-end':'flex-start'};max-width:86%;padding:7px 9px;border-radius:10px;background:${m.senderUid===currentUser?.uid?'rgba(25,118,210,.32)':'rgba(255,255,255,.08)'};"><div style="font-size:.78rem;white-space:pre-wrap;overflow-wrap:anywhere;">${esc(m.text)}</div><div style="font-size:.58rem;color:#9aa4b2;margin-top:3px;">${m.senderUid===currentUser?.uid?'You':'Admin'}</div></div>`).join(''):'<div style="text-align:center;color:#9aa4b2;font-size:.72rem;padding:35px 8px;">আপনার কোনো message নেই। সাহায্যের জন্য লিখুন।</div>';
+    if(!rows.length){list.innerHTML='<div class="gz-help-empty"><div class="gz-help-empty-icon">💬</div>এখনো কোনো মেসেজ নেই।<br>আপনার সমস্যা বা প্রশ্ন লিখুন—Support Team এখানে রিপ্লাই দেবে।</div>';return;}
+    list.innerHTML=rows.map(([id,m])=>{
+      const isAdmin=m?.senderType==='admin'||m?.role==='admin'||(!!m?.senderUid&&m.senderUid!==currentUser?.uid);
+      const role=isAdmin?'admin':'user';
+      const label=isAdmin?'অ্যাডমিন / Support Team':'আপনি';
+      const icon=isAdmin?'🛡️':'👤';
+      return `<div class="gz-help-row ${role}"><div class="gz-help-sender"><span class="gz-help-role-icon">${icon}</span>${label}</div><div class="gz-help-bubble">${esc(m?.text??m?.message??'')}</div><div class="gz-help-time">${esc(formatTime(m?.timestamp))}</div></div>`;
+    }).join('');
     list.scrollTop=list.scrollHeight;
   }
   function start(){
@@ -4155,10 +4212,10 @@ function rbLockAndSpin(){
   close?.addEventListener('click',()=>{stop();modal.classList.add('hidden');});
   send?.addEventListener('click',async()=>{
     if(!currentUser)return; const text=input.value.trim(); if(!text)return;
-    send.disabled=true; status.textContent='';
-    try{await db.ref('supportChats/'+currentUser.uid+'/messages').push({text:text.slice(0,500),senderUid:currentUser.uid,senderType:'user',timestamp:firebase.database.ServerValue.TIMESTAMP}); input.value='';}
-    catch(e){status.textContent='Message পাঠানো যায়নি: '+(e.message||e);}
-    finally{send.disabled=false;input.focus();}
+    send.disabled=true; status.textContent=''; send.textContent='পাঠানো হচ্ছে…';
+    try{await db.ref('supportChats/'+currentUser.uid+'/messages').push({text:text.slice(0,500),senderUid:currentUser.uid,senderType:'user',timestamp:firebase.database.ServerValue.TIMESTAMP}); input.value=''; status.textContent='মেসেজ পাঠানো হয়েছে।';}
+    catch(e){status.textContent='মেসেজ পাঠানো যায়নি: '+(e.message||e);}
+    finally{send.disabled=false;send.textContent='পাঠান ➤';input.focus();}
   });
   input?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send.click();}});
 })();
