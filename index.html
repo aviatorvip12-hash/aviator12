@@ -2066,6 +2066,22 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             applyCgConfigToUI();
         });
 
+        // Flag King RTP is independent; bet options, enabled state and animation remain shared with Boxing King.
+        let fkRtpConfig = {
+            rtpFactor: 1.0,
+            testMode: false,
+            testUserUid: '',
+            testRtpFactor: 1.0
+        };
+        db.ref('config/flagKing').on('value', function(snapshot) {
+            const cfg = snapshot.val() || {};
+            fkRtpConfig = Object.assign({}, fkRtpConfig, cfg);
+            console.log('[Gaming Zone] Flag King RTP config loaded:', fkRtpConfig.rtpFactor);
+        }, function(error) {
+            console.warn('[Gaming Zone] Flag King RTP config load failed:', error);
+            fkRtpConfig.rtpFactor = 1.0;
+        });
+
         function updateSharedBalanceUI() {
             const lobbyBalEl = document.getElementById('lobby-bal');
             if (lobbyBalEl) lobbyBalEl.innerText = currentBalance.toFixed(2);
@@ -2494,7 +2510,12 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             }
 
             const isBetActiveForCurrentRound = (betRoundIndex === currentRoundIndex);
-            const state = roundState.state;
+            // Render the crash locally at the exact shared crashAtMs timestamp instead of
+            // waiting for the Firebase state-change event to reach this device. This keeps
+            // the visible crash boundary tied to the shared schedule on every client.
+            const state = (roundState.state === 'flying' && Number.isFinite(crashAtMs) && now >= crashAtMs)
+                ? 'crashed'
+                : roundState.state;
 
             if (state === 'countdown') {
                 const countdownEnd = Number(roundState.roundStartAt);
@@ -3206,10 +3227,9 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             document.getElementById("fk-bet-plus-btn").disabled = disabled;
         }
 
-        // Flag King uses the exact same Boxing King sandbox/test-user decision.
-        // This keeps the Global RTP configuration shared with Boxing King.
+        // Flag King has its own RTP sandbox/test-user settings; game enablement remains shared.
         function isFkSandboxTestUser() {
-            return typeof isBkSandboxTestUser === 'function' ? isBkSandboxTestUser() : false;
+            return !!(fkRtpConfig.testMode && currentUser && fkRtpConfig.testUserUid && currentUser.uid === fkRtpConfig.testUserUid);
         }
 
         function handleFkSpinClick() {
@@ -3357,7 +3377,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
 
             if (winningIndices.length > 0) {
                 const currentMultiplier = FK_MULTIPLIER_STEPS[fkCurrentMultiplierIndex];
-                const configuredRtp = isFkSandboxTestUser() ? Number(bkConfig.testRtpFactor) : Number(bkConfig.rtpFactor);
+                const configuredRtp = isFkSandboxTestUser() ? Number(fkRtpConfig.testRtpFactor) : Number(fkRtpConfig.rtpFactor);
                 const rtpFactor = Number.isFinite(configuredRtp) && configuredRtp > 0 ? configuredRtp : 1.0;
                 const stepWin = evalResult.matchUnits * (activeBet * 0.4) * currentMultiplier * rtpFactor;
 
