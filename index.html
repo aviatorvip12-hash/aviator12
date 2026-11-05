@@ -982,6 +982,83 @@
         #withdraw-modal .wd-foot { padding: 10px 12px; text-align: center; font-size: .9rem; background: #0a0828; border-top: 2px solid #3b3a8f; }
         #withdraw-modal .wd-foot b { color: #ffc928; }
         #withdraw-modal .withdraw-cooldown-notice { margin: 0 0 10px; padding: 10px 12px; font-size: .85rem; border-radius: 12px; }
+        /* === Update 49: Deposit modal redesign (shares wd- styles) === */
+        #deposit-modal { background: radial-gradient(circle at 50% 0%, rgba(90,60,220,.35), rgba(5,4,25,.94) 70%); padding: 10px; }
+        #deposit-modal .wd-card { width: 100%; max-width: 440px; max-height: 94vh; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: linear-gradient(180deg,#1c1760,#0d0a33 60%,#0a0828); border: 2px solid #4a3fd0; box-shadow: 0 0 34px rgba(120,90,255,.45), inset 0 0 24px rgba(0,0,0,.5); color: #f2f0ff; }
+        #deposit-modal .wd-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: linear-gradient(90deg,#8a3dff,#5b2bd6); border-bottom: 2px solid #b79bff55; }
+        #deposit-modal .wd-head-icon { font-size: 1.6rem; }
+        #deposit-modal .wd-head h2 { flex: 1; margin: 0; font-size: 1.2rem; font-weight: 800; color: #fff; }
+        #deposit-modal .wd-head h2 span { font-weight: 700; }
+        #deposit-modal .wd-close { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #ffffff44; background: rgba(0,0,0,.28); color: #fff; font-size: 1rem; cursor: pointer; }
+        #deposit-modal .wd-body { padding: 12px 14px 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        #deposit-modal .wd-label { margin: 12px 0 7px; font-size: .95rem; font-weight: 700; color: #fff; }
+        #deposit-modal .wd-balance-pill { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; border-radius: 14px; background: #120e45; border: 2px solid #6d4dff; font-size: .9rem; }
+        #deposit-modal .wd-balance-pill b { color: #ffd23f; font-size: 1.15rem; }
+        #deposit-modal .wd-hidden-select { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        #deposit-modal .wd-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        #deposit-modal .wd-method { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 58px; border-radius: 12px; border: 2px solid #3a3680; background: linear-gradient(#e9e8ff,#cfcdf3); font-size: 1.35rem; font-weight: 800; cursor: pointer; opacity: .75; transition: .15s; }
+        #deposit-modal .wd-bkash span { color: #3b1a35; }
+        #deposit-modal .wd-nagad span { color: #e4351e; }
+        #deposit-modal .wd-method.active { opacity: 1; border-color: #ff4fd8; box-shadow: 0 0 14px #ff4fd899; background: linear-gradient(#fff,#f1e6ff); }
+        #deposit-modal .wd-nagad.active { border-color: #ff9a3d; box-shadow: 0 0 14px #ff9a3d99; background: linear-gradient(#fff,#fff0e2); }
+        #deposit-modal .wd-tick { display: none; position: absolute; top: -9px; right: -7px; width: 24px; height: 24px; line-height: 24px; border-radius: 50%; background: #ff4fd8; color: #fff; font-style: normal; font-size: .8rem; font-weight: 900; }
+        #deposit-modal .wd-nagad .wd-tick { background: #ff9a3d; }
+        #deposit-modal .wd-method.active .wd-tick { display: block; }
+        #deposit-modal .wd-chips { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+        #deposit-modal .wd-chips button { padding: 11px 0; border-radius: 10px; border: 2px solid #3b3a8f; background: linear-gradient(#25236e,#16144d); color: #fff; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
+        #deposit-modal .wd-chips button.sel, #deposit-modal .wd-chips button:active { border-color: #ffd23f; box-shadow: 0 0 10px #ffd23f66; color: #ffd23f; }
+        #deposit-modal .wd-amount-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        #deposit-modal .wd-amount-row input, #deposit-modal .wd-account { width: 100%; padding: 12px 14px; border-radius: 10px; border: 2px solid #fff; background: #07051f; color: #fff; font-size: 1.25rem; font-weight: 700; outline: none; box-sizing: border-box; }
+        #deposit-modal .wd-account { font-size: 1rem; font-weight: 600; border-color: #5b4fd6; }
+        #deposit-modal .wd-amount-row input:focus, #deposit-modal .wd-account:focus { border-color: #ffd23f; box-shadow: 0 0 10px #ffd23f55; }
+        #deposit-modal .wd-amount-badge { min-width: 78px; text-align: right; color: #2ee06a; font-size: 1.5rem; font-weight: 800; }
+        #deposit-modal .wd-summary { margin-top: 14px; padding: 10px 12px; border-radius: 12px; border: 2px solid #17c93f; background: rgba(8,40,25,.55); box-shadow: 0 0 12px #17c93f44; }
+        #deposit-modal .wd-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: .92rem; }
+        #deposit-modal .wd-row b { color: #ffd23f; font-size: 1rem; }
+        #deposit-modal .wd-row-ok i { display: inline-block; width: 20px; height: 20px; line-height: 20px; margin-right: 4px; border-radius: 50%; background: #2ee06a; color: #07281a; text-align: center; font-style: normal; font-size: .75rem; font-weight: 900; }
+        #deposit-modal .av-error-msg { min-height: 0; margin-top: 8px; font-size: .82rem; }
+        #deposit-modal .wd-submit { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 10px; padding: 13px; border-radius: 14px; border: 2px solid #5dff7e; background: linear-gradient(#2fd24f,#138a2c); color: #fff; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 0 16px #2fd24f77; }
+        #deposit-modal .wd-submit:active { transform: scale(.98); }
+        #deposit-modal .wd-submit:disabled { opacity: .6; filter: grayscale(.4); }
+        #deposit-modal .wd-info { margin-top: 16px; border-radius: 16px; border: 2px solid #3b3a8f; background: linear-gradient(#17145a,#0d0a38); overflow: hidden; }
+        #deposit-modal .wd-info-title { padding: 8px 12px; text-align: center; font-size: 1.05rem; font-weight: 800; color: #3a2400; background: linear-gradient(90deg,#ffb300,#ffd54a,#ffb300); }
+        #deposit-modal .wd-info ul { list-style: none; margin: 0; padding: 10px 12px; }
+        #deposit-modal .wd-info li { display: flex; align-items: flex-start; gap: 10px; padding: 5px 0; font-size: .92rem; line-height: 1.35; }
+        #deposit-modal .wd-info li i { flex: none; width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background: #1fbf3f; color: #fff; text-align: center; font-style: normal; font-size: .8rem; font-weight: 900; }
+        #deposit-modal .wd-tip { display: flex; gap: 10px; margin-top: 12px; padding: 10px 12px; border-radius: 14px; border: 2px solid #ffc928; background: #0b0828; font-size: .9rem; line-height: 1.4; }
+        #deposit-modal .wd-tip span { font-size: 1.4rem; }
+        #deposit-modal .wd-tip b { color: #ffd23f; }
+        #deposit-modal .wd-foot { padding: 10px 12px; text-align: center; font-size: .9rem; background: #0a0828; border-top: 2px solid #3b3a8f; }
+        #deposit-modal .wd-foot b { color: #ffc928; }
+        #deposit-modal .withdraw-cooldown-notice { margin: 0 0 10px; padding: 10px 12px; font-size: .85rem; border-radius: 12px; }
+        #deposit-modal .wd-method { outline: none !important; }
+        #deposit-modal .dp-head { background: linear-gradient(90deg,#ff8a00,#c9378f 60%,#6d3bd9); }
+        #deposit-modal .dp-steps { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px 0; }
+        #deposit-modal .dp-step { display: flex; align-items: center; gap: 6px; font-size: .8rem; color: #9e9bd6; }
+        #deposit-modal .dp-step b { width: 24px; height: 24px; line-height: 24px; border-radius: 50%; text-align: center; background: #25236e; border: 1px solid #4a3fd0; }
+        #deposit-modal .dp-step.on { color: #fff; font-weight: 700; }
+        #deposit-modal .dp-step.on b { background: #ffc928; color: #3a2400; border-color: #ffc928; }
+        #deposit-modal .dp-step.done b { background: #1fbf3f; color: #fff; border-color: #1fbf3f; }
+        #deposit-modal .dp-line { flex: 0 0 34px; height: 2px; background: #4a3fd0; }
+        #deposit-modal .dp-hint { margin-top: 6px; font-size: .78rem; color: #a9a6e6; }
+        #deposit-modal .dp-badge { color: #ffd23f; }
+        #deposit-modal .dp-submit { border-color: #ffd86b; background: linear-gradient(#ffb300,#e06a00); box-shadow: 0 0 16px #ffb30077; color: #fff; }
+        #deposit-modal .dp-submit:disabled { cursor: not-allowed; }
+        #deposit-modal .dp-portal { padding: 14px 12px; border-radius: 16px; border: 2px solid #6d4dff; background: linear-gradient(#17145a,#0d0a38); text-align: center; }
+        #deposit-modal .dp-portal-row { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 8px; border-bottom: 1px dashed #4a3fd0; font-size: .9rem; color: #c9c6ff; }
+        #deposit-modal .dp-portal-row strong { color: #fff; font-size: 1.2rem; }
+        #deposit-modal .dp-portal-amt-label { margin-top: 8px; font-size: .85rem; color: #a9a6e6; }
+        #deposit-modal .dp-portal-amt { display: block; margin: 2px 0 6px; font-size: 2rem; color: #ffd23f; text-shadow: 0 0 12px #ffb30088; }
+        #deposit-modal .dp-number-box { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; padding: 10px 12px; border-radius: 12px; border: 2px dashed #ffc928; background: #07051f; }
+        #deposit-modal .dp-number-box strong { color: #ffd23f; font-size: 1.3rem; overflow-wrap: anywhere; text-align: left; }
+        #deposit-modal .dp-copy { flex: none; padding: 8px 12px; border-radius: 10px; border: 1px solid #ffc928; background: #25236e; color: #fff; font-weight: 700; cursor: pointer; }
+        #deposit-modal .dp-note { margin-top: 10px; font-size: .8rem; line-height: 1.45; color: #a9a6e6; }
+        #deposit-modal .dp-how { margin: 12px 0 0; padding: 0 0 0 20px; font-size: .88rem; line-height: 1.6; color: #e6e4ff; }
+        #deposit-modal .dp-how b { color: #ffd23f; }
+        #deposit-modal .dp-back { display: block; width: 100%; margin-top: 8px; padding: 10px; border-radius: 12px; border: 1px solid #4a3fd0; background: transparent; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; }
+        #deposit-modal .dp-msg { margin: 10px 0 0; font-size: .85rem; }
+        #deposit-modal .dp-info { margin-top: 16px; }
+        #deposit-modal .wd-tip { margin-top: 12px; }
 
 /* === Gaming Zone Update 3: lobby-only visual refresh === */
 :root{--lobby-bg:#064748;--lobby-card-bg:rgba(0,67,72,.94);--lobby-accent:#35efc1;--lobby-accent-orange:#ffc15a;--lobby-glass-border:rgba(53,239,193,.22);--lobby-text:#effffb;--lobby-text-dim:#b3e7dd}
@@ -1092,38 +1169,103 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         </div>
     </div>
 
-    <!-- DEPOSIT MODAL: two-step payment portal, matching the supplied screenshots -->
+    <!-- DEPOSIT MODAL (redesign: Update 49) — two-step payment portal -->
     <div class="av-modal-overlay hidden" id="deposit-modal">
-      <div class="av-glass-card av-modal" style="max-width:620px;min-height:430px;padding:16px;">
-        <section id="deposit-step-one">
-          <h2 style="margin:0 0 18px;">➕ ডিপোজিট</h2>
-          <p style="text-align:center;color:var(--text-dim);margin:0 0 24px;">প্রথমে পেমেন্ট মাধ্যম ও Amount নির্বাচন করুন</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px;">
-            <button type="button" id="deposit-bkash-choice" class="deposit-method-choice" style="border:1px solid #a21d61;background:#321b32;color:white;border-radius:20px;padding:18px 8px;font-size:20px;font-weight:700;">bK<br><small>bKash</small></button>
-            <button type="button" id="deposit-nagad-choice" class="deposit-method-choice" style="border:1px solid #414957;background:#202733;color:white;border-radius:20px;padding:18px 8px;font-size:20px;font-weight:700;">ন<br><small>Nagad</small></button>
+      <div class="wd-card dp-card" role="dialog" aria-modal="true" aria-labelledby="dp-title">
+        <div class="wd-head dp-head">
+          <span class="wd-head-icon" aria-hidden="true">➕</span>
+          <h2 id="dp-title">ডিপোজিট <span>(Deposit)</span></h2>
+          <button type="button" class="wd-close" id="close-deposit-btn" aria-label="বন্ধ করুন">✕</button>
+        </div>
+
+        <div class="dp-steps" aria-hidden="true">
+          <div class="dp-step on" id="dp-st1"><b>১</b><span>মাধ্যম ও Amount</span></div>
+          <div class="dp-line"></div>
+          <div class="dp-step" id="dp-st2"><b>২</b><span>পেমেন্ট ও TrxID</span></div>
+        </div>
+
+        <div class="wd-body">
+          <section id="deposit-step-one">
+            <div class="wd-label" style="margin-top:4px;">পেমেন্ট মাধ্যম নির্বাচন করুন</div>
+            <div class="wd-methods">
+              <button type="button" id="deposit-bkash-choice" class="deposit-method-choice wd-method wd-bkash active" data-method="bkash">
+                <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><polygon points="3,6 26,14 20,20 14,36 11,20" fill="#e2136e"/><polygon points="26,14 37,10 20,20" fill="#ff5fa2"/></svg>
+                <span>bKash</span><i class="wd-tick">✓</i>
+              </button>
+              <button type="button" id="deposit-nagad-choice" class="deposit-method-choice wd-method wd-nagad" data-method="nagad">
+                <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#f26a21"/><circle cx="20" cy="20" r="8" fill="#fff" opacity=".9"/><circle cx="20" cy="20" r="4" fill="#e8281e"/></svg>
+                <span>নগদ</span><i class="wd-tick">✓</i>
+              </button>
+            </div>
+
+            <div class="wd-label">ডিপোজিট Amount লিখুন (৳)</div>
+            <div class="wd-chips" id="dp-chips">
+              <button type="button" data-amt="50">50</button>
+              <button type="button" data-amt="100">100</button>
+              <button type="button" data-amt="200">200</button>
+              <button type="button" data-amt="500">500</button>
+              <button type="button" data-amt="1000">1,000</button>
+              <button type="button" data-amt="5000">5,000</button>
+            </div>
+            <div class="wd-amount-row">
+              <input type="number" id="deposit-amount" placeholder="যেমন: ৫০" value="" min="50" inputmode="numeric">
+              <div class="wd-amount-badge dp-badge">৳<span id="dp-amount-badge">0</span></div>
+            </div>
+            <div class="dp-hint">ন্যূনতম ডিপোজিট ৳50</div>
+
+            <button type="button" class="wd-submit dp-submit" id="deposit-next-btn" disabled>
+              <span>পরবর্তী ধাপ</span><span aria-hidden="true">➜</span>
+            </button>
+
+            <div class="wd-info dp-info">
+              <div class="wd-info-title">👑 সেরা ডিপোজিট সিস্টেম</div>
+              <ul>
+                <li><i>✓</i>bKash ও Nagad – দুইটিই আছে</li>
+                <li><i>✓</i>ন্যূনতম ডিপোজিট: ৳50</li>
+                <li><i>✓</i>TrxID দিয়ে সহজ রিকোয়েস্ট</li>
+                <li><i>✓</i>ডিপোজিটের পর ৬ ঘণ্টা উত্তোলন লক (নিরাপত্তার জন্য)</li>
+              </ul>
+            </div>
+          </section>
+
+          <section id="deposit-step-two" class="hidden">
+            <div class="dp-portal">
+              <div class="dp-portal-row"><span>পেমেন্ট করুন</span><strong id="deposit-portal-method">bKash</strong></div>
+              <div class="dp-portal-amt-label">পাঠানোর Amount</div>
+              <strong id="deposit-portal-amount" class="dp-portal-amt">৳50</strong>
+              <div class="dp-portal-amt-label">এই নম্বরে টাকা পাঠান</div>
+              <div class="dp-number-box">
+                <strong id="deposit-portal-number">লোড হচ্ছে...</strong>
+                <button type="button" id="dp-copy-btn" class="dp-copy">📋 কপি</button>
+              </div>
+              <div id="deposit-pending-note" class="dp-note"></div>
+            </div>
+
+            <ol class="dp-how">
+              <li>আপনার bKash/Nagad অ্যাপ থেকে উপরের নম্বরে <b>Send Money</b> করুন।</li>
+              <li>পেমেন্ট শেষে পাওয়া <b>TrxID</b> কপি করুন।</li>
+              <li>নিচে TrxID দিয়ে রিকোয়েস্ট পাঠান।</li>
+            </ol>
+
+            <div class="wd-label">ট্রানজেকশন আইডি (TrxID)</div>
+            <input type="text" id="deposit-trxid" class="wd-account" placeholder="ট্রানজেকশন আইডি (TrxID) দিন" required>
+
+            <button type="button" class="wd-submit dp-submit" id="deposit-confirm-btn">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2 12 22 3l-5 18-5-7-10-2Z" fill="#fff" opacity=".95"/></svg>
+              <span>রিকোয়েস্ট পাঠান</span>
+            </button>
+            <button type="button" class="dp-back" id="deposit-back-btn">← Back</button>
+          </section>
+
+          <div class="av-error-msg dp-msg" id="deposit-msg" style="color:#81c784;"></div>
+
+          <div class="wd-tip">
+            <span>💡</span>
+            <div><b>গুরুত্বপূর্ণ পরামর্শ:</b><br>সঠিক Amount পাঠান এবং সঠিক TrxID দিন, তাহলে রিকোয়েস্ট যাচাই সহজ হবে।</div>
           </div>
-          <label for="deposit-amount" style="color:var(--text-dim);display:block;margin-bottom:6px;">ডিপোজিট Amount</label>
-          <input type="number" id="deposit-amount" placeholder="যেমন: ৫০" value="" min="50" style="width:100%;box-sizing:border-box;margin-bottom:28px;">
-          <div style="display:flex;gap:8px;">
-            <button type="button" class="av-btn av-btn-deposit" id="deposit-next-btn" style="flex:1;padding:12px;" disabled>Next ➜</button>
-            <button type="button" class="av-btn av-btn-logout" id="close-deposit-btn" style="padding:12px;">বন্ধ</button>
-          </div>
-          <div class="av-error-msg" id="deposit-msg" style="color:#81c784;margin-top:10px;"></div>
-        </section>
-        <section id="deposit-step-two" class="hidden">
-          <h2 style="margin:0 0 18px;">💳 পেমেন্ট পোর্টাল</h2>
-          <div style="background:rgba(255,255,255,.045);border:1px solid #343b48;border-radius:20px;padding:22px 12px;text-align:center;margin-bottom:20px;">
-            <div style="color:var(--text-dim);">পেমেন্ট করুন</div><strong id="deposit-portal-method" style="font-size:20px;display:block;margin:4px 0 16px;">bKash</strong>
-            <div style="color:var(--text-dim);">পাঠানোর Amount</div><strong id="deposit-portal-amount" style="display:block;color:#ffcc00;font-size:30px;margin:4px 0 22px;">৳50</strong>
-            <div style="color:var(--text-dim);">এই নম্বরে টাকা পাঠান</div><strong id="deposit-portal-number" style="display:block;color:#ffcc00;font-size:25px;margin:4px 0 12px;overflow-wrap:anywhere;">লোড হচ্ছে...</strong>
-            <div id="deposit-pending-note" style="color:var(--text-dim);font-size:14px;line-height:1.5;"></div>
-          </div>
-          <input type="text" id="deposit-trxid" placeholder="ট্রানজেকশন আইডি (TrxID) দিন" required style="width:100%;box-sizing:border-box;margin-bottom:20px;">
-          <div style="display:flex;gap:8px;">
-            <button type="button" class="av-btn av-btn-deposit" id="deposit-confirm-btn" style="flex:1;padding:12px;">রিকোয়েস্ট পাঠান</button>
-            <button type="button" class="av-btn av-btn-logout" id="deposit-back-btn" style="padding:12px;">← Back</button>
-          </div>
-        </section>
+        </div>
+
+        <div class="wd-foot">🛡️ নিরাপদ, দ্রুত ও নির্ভরযোগ্য – <b>কাগজের বিমান</b></div>
       </div>
     </div>
 
@@ -1261,6 +1403,41 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
   amount.addEventListener('input',refreshAmount);
   modal.addEventListener('click',e=>{ if(e.target===modal) $('close-withdraw-btn').click(); });
   fill(null);
+})();
+</script>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const modal=$('deposit-modal'); if(!modal) return;
+  const amount=$('deposit-amount');
+  function refresh(){
+    const v=parseFloat(amount.value);
+    const ok=Number.isFinite(v)&&v>0;
+    $('dp-amount-badge').textContent=ok?v.toLocaleString('en-US'):'0';
+    modal.querySelectorAll('#dp-chips button').forEach(b=>b.classList.toggle('sel',ok&&Number(b.dataset.amt)===v));
+  }
+  function syncSteps(){
+    const two=!$('deposit-step-two').classList.contains('hidden');
+    $('dp-st1').className='dp-step'+(two?' done':' on');
+    $('dp-st2').className='dp-step'+(two?' on':'');
+    const m=modal.querySelector('.modal-body, .wd-body'); if(m) m.scrollTop=0;
+  }
+  modal.querySelectorAll('#dp-chips button').forEach(b=>b.addEventListener('click',()=>{
+    amount.value=b.dataset.amt; amount.dispatchEvent(new Event('input',{bubbles:true}));
+  }));
+  amount.addEventListener('input',refresh);
+  new MutationObserver(syncSteps).observe($('deposit-step-two'),{attributes:true,attributeFilter:['class']});
+  $('dp-copy-btn').addEventListener('click',async()=>{
+    const t=($('deposit-portal-number').textContent||'').trim(); const b=$('dp-copy-btn');
+    try{ await navigator.clipboard.writeText(t); b.textContent='✓ কপি হয়েছে'; }
+    catch(e){ try{ const r=document.createRange(); r.selectNodeContents($('deposit-portal-number')); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent='নম্বর সিলেক্ট হয়েছে'; }catch(_){} }
+    setTimeout(()=>{ b.textContent='📋 কপি'; },1800);
+  });
+  modal.addEventListener('click',e=>{ if(e.target===modal) $('close-deposit-btn').click(); });
+  // The Deposit button lives later in the page, so listen at document level.
+  document.addEventListener('click',e=>{ if(e.target.closest&&e.target.closest('#deposit-btn')) setTimeout(()=>{refresh();syncSteps();},0); });
+  refresh();
 })();
 </script>
 
@@ -1891,6 +2068,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             selectedDepositMethod = method;
             document.getElementById('deposit-bkash-choice').style.outline = method === 'bkash' ? '2px solid #d42b83' : 'none';
             document.getElementById('deposit-nagad-choice').style.outline = method === 'nagad' ? '2px solid #e6a23c' : 'none';
+            document.querySelectorAll('#deposit-modal .wd-method').forEach(b => b.classList.toggle('active', b.dataset.method === method));
             depositNextBtn.disabled = !(Number(depositAmountInput.value) >= 50);
         }
         document.getElementById('deposit-bkash-choice').addEventListener('click', () => setDepositMethod('bkash'));
