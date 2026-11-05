@@ -933,6 +933,56 @@
         .withdraw-cooldown-notice strong { color: #ffd27a; }
         .withdraw-cooldown-notice.hidden { display: none; }
 
+        /* === Update 48: Withdraw modal redesign === */
+        #withdraw-modal { background: radial-gradient(circle at 50% 0%, rgba(90,60,220,.35), rgba(5,4,25,.94) 70%); padding: 10px; }
+        #withdraw-modal .wd-card { width: 100%; max-width: 440px; max-height: 94vh; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: linear-gradient(180deg,#1c1760,#0d0a33 60%,#0a0828); border: 2px solid #4a3fd0; box-shadow: 0 0 34px rgba(120,90,255,.45), inset 0 0 24px rgba(0,0,0,.5); color: #f2f0ff; }
+        #withdraw-modal .wd-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: linear-gradient(90deg,#8a3dff,#5b2bd6); border-bottom: 2px solid #b79bff55; }
+        #withdraw-modal .wd-head-icon { font-size: 1.6rem; }
+        #withdraw-modal .wd-head h2 { flex: 1; margin: 0; font-size: 1.2rem; font-weight: 800; color: #fff; }
+        #withdraw-modal .wd-head h2 span { font-weight: 700; }
+        #withdraw-modal .wd-close { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #ffffff44; background: rgba(0,0,0,.28); color: #fff; font-size: 1rem; cursor: pointer; }
+        #withdraw-modal .wd-body { padding: 12px 14px 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        #withdraw-modal .wd-label { margin: 12px 0 7px; font-size: .95rem; font-weight: 700; color: #fff; }
+        #withdraw-modal .wd-balance-pill { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; border-radius: 14px; background: #120e45; border: 2px solid #6d4dff; font-size: .9rem; }
+        #withdraw-modal .wd-balance-pill b { color: #ffd23f; font-size: 1.15rem; }
+        #withdraw-modal .wd-hidden-select { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        #withdraw-modal .wd-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        #withdraw-modal .wd-method { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 58px; border-radius: 12px; border: 2px solid #3a3680; background: linear-gradient(#e9e8ff,#cfcdf3); font-size: 1.35rem; font-weight: 800; cursor: pointer; opacity: .75; transition: .15s; }
+        #withdraw-modal .wd-bkash span { color: #3b1a35; }
+        #withdraw-modal .wd-nagad span { color: #e4351e; }
+        #withdraw-modal .wd-method.active { opacity: 1; border-color: #ff4fd8; box-shadow: 0 0 14px #ff4fd899; background: linear-gradient(#fff,#f1e6ff); }
+        #withdraw-modal .wd-nagad.active { border-color: #ff9a3d; box-shadow: 0 0 14px #ff9a3d99; background: linear-gradient(#fff,#fff0e2); }
+        #withdraw-modal .wd-tick { display: none; position: absolute; top: -9px; right: -7px; width: 24px; height: 24px; line-height: 24px; border-radius: 50%; background: #ff4fd8; color: #fff; font-style: normal; font-size: .8rem; font-weight: 900; }
+        #withdraw-modal .wd-nagad .wd-tick { background: #ff9a3d; }
+        #withdraw-modal .wd-method.active .wd-tick { display: block; }
+        #withdraw-modal .wd-chips { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+        #withdraw-modal .wd-chips button { padding: 11px 0; border-radius: 10px; border: 2px solid #3b3a8f; background: linear-gradient(#25236e,#16144d); color: #fff; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
+        #withdraw-modal .wd-chips button.sel, #withdraw-modal .wd-chips button:active { border-color: #ffd23f; box-shadow: 0 0 10px #ffd23f66; color: #ffd23f; }
+        #withdraw-modal .wd-amount-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        #withdraw-modal .wd-amount-row input, #withdraw-modal .wd-account { width: 100%; padding: 12px 14px; border-radius: 10px; border: 2px solid #fff; background: #07051f; color: #fff; font-size: 1.25rem; font-weight: 700; outline: none; box-sizing: border-box; }
+        #withdraw-modal .wd-account { font-size: 1rem; font-weight: 600; border-color: #5b4fd6; }
+        #withdraw-modal .wd-amount-row input:focus, #withdraw-modal .wd-account:focus { border-color: #ffd23f; box-shadow: 0 0 10px #ffd23f55; }
+        #withdraw-modal .wd-amount-badge { min-width: 78px; text-align: right; color: #2ee06a; font-size: 1.5rem; font-weight: 800; }
+        #withdraw-modal .wd-summary { margin-top: 14px; padding: 10px 12px; border-radius: 12px; border: 2px solid #17c93f; background: rgba(8,40,25,.55); box-shadow: 0 0 12px #17c93f44; }
+        #withdraw-modal .wd-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: .92rem; }
+        #withdraw-modal .wd-row b { color: #ffd23f; font-size: 1rem; }
+        #withdraw-modal .wd-row-ok i { display: inline-block; width: 20px; height: 20px; line-height: 20px; margin-right: 4px; border-radius: 50%; background: #2ee06a; color: #07281a; text-align: center; font-style: normal; font-size: .75rem; font-weight: 900; }
+        #withdraw-modal .av-error-msg { min-height: 0; margin-top: 8px; font-size: .82rem; }
+        #withdraw-modal .wd-submit { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 10px; padding: 13px; border-radius: 14px; border: 2px solid #5dff7e; background: linear-gradient(#2fd24f,#138a2c); color: #fff; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 0 16px #2fd24f77; }
+        #withdraw-modal .wd-submit:active { transform: scale(.98); }
+        #withdraw-modal .wd-submit:disabled { opacity: .6; filter: grayscale(.4); }
+        #withdraw-modal .wd-info { margin-top: 16px; border-radius: 16px; border: 2px solid #3b3a8f; background: linear-gradient(#17145a,#0d0a38); overflow: hidden; }
+        #withdraw-modal .wd-info-title { padding: 8px 12px; text-align: center; font-size: 1.05rem; font-weight: 800; color: #3a2400; background: linear-gradient(90deg,#ffb300,#ffd54a,#ffb300); }
+        #withdraw-modal .wd-info ul { list-style: none; margin: 0; padding: 10px 12px; }
+        #withdraw-modal .wd-info li { display: flex; align-items: flex-start; gap: 10px; padding: 5px 0; font-size: .92rem; line-height: 1.35; }
+        #withdraw-modal .wd-info li i { flex: none; width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background: #1fbf3f; color: #fff; text-align: center; font-style: normal; font-size: .8rem; font-weight: 900; }
+        #withdraw-modal .wd-tip { display: flex; gap: 10px; margin-top: 12px; padding: 10px 12px; border-radius: 14px; border: 2px solid #ffc928; background: #0b0828; font-size: .9rem; line-height: 1.4; }
+        #withdraw-modal .wd-tip span { font-size: 1.4rem; }
+        #withdraw-modal .wd-tip b { color: #ffd23f; }
+        #withdraw-modal .wd-foot { padding: 10px 12px; text-align: center; font-size: .9rem; background: #0a0828; border-top: 2px solid #3b3a8f; }
+        #withdraw-modal .wd-foot b { color: #ffc928; }
+        #withdraw-modal .withdraw-cooldown-notice { margin: 0 0 10px; padding: 10px 12px; font-size: .85rem; border-radius: 12px; }
+
 /* === Gaming Zone Update 3: lobby-only visual refresh === */
 :root{--lobby-bg:#064748;--lobby-card-bg:rgba(0,67,72,.94);--lobby-accent:#35efc1;--lobby-accent-orange:#ffc15a;--lobby-glass-border:rgba(53,239,193,.22);--lobby-text:#effffb;--lobby-text-dim:#b3e7dd}
 body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100%)!important;color:#effffb}
@@ -980,6 +1030,17 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
 @media(max-width:360px){.lobby-header{padding:8px!important}.lobby-brand-title{font-size:16px!important}.games-grid{gap:6px!important}.gz-promo{padding:15px;min-height:155px}}
 @media(min-width:600px){.gz-bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(100%,520px)}}
 
+
+        /* Modern Paper Plane login/register panel — visual-only styling */
+        .kb-auth-form{padding:18px 14px 12px;border:1px solid rgba(190,105,255,.48);border-radius:22px;background:radial-gradient(circle at 50% 0%,rgba(116,42,214,.25),transparent 48%),linear-gradient(145deg,rgba(15,8,39,.98),rgba(30,10,66,.96));box-shadow:0 0 28px rgba(160,60,255,.22),inset 0 0 22px rgba(255,255,255,.025)}
+        .kb-auth-mark{width:54px;height:54px;margin:0 auto 7px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(135deg,#7c3aed,#d946ef);font-size:27px;box-shadow:0 0 22px rgba(190,70,255,.55)}
+        .kb-auth-caption{text-align:center;color:#cbb4ff;font-size:10px;letter-spacing:2px;font-weight:900;margin-bottom:18px}
+        .kb-auth-form .form-group{margin:11px 0}
+        .kb-auth-form .form-group input{width:100%;min-height:48px;padding:12px 14px;border-radius:13px;border:1px solid rgba(171,105,255,.55);background:rgba(5,4,22,.82);color:#fff;outline:none;font-size:14px;box-shadow:inset 0 0 12px rgba(0,0,0,.25)}
+        .kb-auth-form .form-group input:focus{border-color:#e879f9;box-shadow:0 0 0 3px rgba(192,80,255,.16),0 0 16px rgba(192,80,255,.18)}
+        .kb-auth-submit{width:100%;min-height:49px!important;border-radius:14px!important;margin-top:8px;font-size:16px!important;font-weight:900!important;background:linear-gradient(100deg,#6d28d9,#c026d3)!important;box-shadow:0 7px 20px rgba(168,55,255,.3)}
+        .kb-auth-switch{text-align:center;margin-top:16px;font-size:12px;color:#c4b5fd}.kb-auth-switch a{color:#f0abfc;font-weight:900;text-decoration:none;margin-left:5px}
+        #auth-error{min-height:18px;margin-top:10px;text-align:center}
 </style>
 
 <style id="gz-promo-carousel-style">
@@ -1018,13 +1079,14 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
     <div class="av-modal-overlay hidden" id="auth-modal">
         <div class="av-glass-card av-modal">
             <h2 id="auth-title">GAMING ZONE LOGIN</h2>
-            <form id="auth-form" onsubmit="return false;">
-                <div class="form-group"><input type="email" id="auth-email" placeholder="Email" required></div>
-                <div class="form-group"><input type="password" id="auth-password" placeholder="Password" required></div>
-                <button type="button" class="av-btn av-btn-deposit" style="width: 100%; padding: 8px;" id="auth-submit-btn">Login</button>
-                <div style="margin-top: 8px; font-size: 0.72rem; text-align: center;">
-                    <a href="#" id="toggle-auth-mode" style="color: #64b5f6; text-decoration: none;">Create Account</a>
-                </div>
+            <form id="auth-form" class="kb-auth-form" onsubmit="return false;">
+                <div class="kb-auth-mark">✈️</div>
+                <div class="kb-auth-caption">PAPER PLANE • MEMBER ACCESS</div>
+                <div class="form-group"><input type="email" id="auth-email" placeholder="Email Address" autocomplete="email" required></div>
+                <div class="form-group"><input type="password" id="auth-password" placeholder="Password" autocomplete="current-password" required></div>
+                <div class="form-group" id="auth-phone-wrap" style="display:none"><input type="tel" id="auth-phone" placeholder="Phone Number (বাধ্যতামূলক)" inputmode="tel" autocomplete="tel" maxlength="20"></div>
+                <button type="button" class="av-btn av-btn-deposit kb-auth-submit" id="auth-submit-btn">Login</button>
+                <div class="kb-auth-switch"><span id="auth-switch-hint">নতুন সদস্য?</span> <a href="#" id="toggle-auth-mode">Create Account</a></div>
                 <div class="av-error-msg" id="auth-error"></div>
             </form>
         </div>
@@ -1065,37 +1127,142 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
       </div>
     </div>
 
-    <!-- WITHDRAW MODAL -->
+    <!-- WITHDRAW MODAL (redesign: Update 48) -->
     <div class="av-modal-overlay hidden" id="withdraw-modal">
-        <div class="av-glass-card av-modal">
-            <h2>📤 কয়েন উইথড্র</h2>
-            <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:10px;">
-                আপনার ব্যালেন্স থেকে কয়েন উইথড্র করুন।
-            </div>
-            <div id="withdraw-cooldown-notice" class="withdraw-cooldown-notice hidden">
-                <div id="withdraw-turnover-line" class="hidden">🎯 বোনাস টার্নওভার বাকি: <strong id="withdraw-turnover-countdown"></strong></div>
-                <div id="withdraw-deposit-line" class="hidden" style="margin-top:6px;">🔒 ডিপোজিটের ৬ ঘণ্টা পূর্ণ হতে বাকি: <strong id="withdraw-deposit-countdown"></strong></div>
+        <div class="wd-card" role="dialog" aria-modal="true" aria-labelledby="wd-title">
+            <div class="wd-head">
+                <span class="wd-head-icon" aria-hidden="true">💰</span>
+                <h2 id="wd-title">উত্তোলন <span>(Withdraw)</span></h2>
+                <button type="button" class="wd-close" id="close-withdraw-btn" aria-label="বন্ধ করুন">✕</button>
             </div>
 
-            <div class="form-group">
-                <select id="withdraw-method">
+            <div class="wd-body">
+                <div id="withdraw-cooldown-notice" class="withdraw-cooldown-notice hidden">
+                    <div id="withdraw-turnover-line" class="hidden">🎯 বোনাস টার্নওভার বাকি: <strong id="withdraw-turnover-countdown"></strong></div>
+                    <div id="withdraw-deposit-line" class="hidden" style="margin-top:6px;">🔒 ডিপোজিটের ৬ ঘণ্টা পূর্ণ হতে বাকি: <strong id="withdraw-deposit-countdown"></strong></div>
+                </div>
+
+                <div class="wd-balance-pill">
+                    <span>মেইন ব্যালেন্স</span>
+                    <b>৳<span id="wd-main-balance">0.00</span></b>
+                </div>
+
+                <div class="wd-label">পেমেন্ট পদ্ধতি নির্বাচন করুন</div>
+                <select id="withdraw-method" class="wd-hidden-select" tabindex="-1" aria-hidden="true">
                     <option value="bkash">বিকাশ (Bkash)</option>
                     <option value="nagad">নগদ (Nagad)</option>
                 </select>
+                <div class="wd-methods">
+                    <button type="button" class="wd-method wd-bkash active" data-method="bkash">
+                        <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><polygon points="3,6 26,14 20,20 14,36 11,20" fill="#e2136e"/><polygon points="26,14 37,10 20,20" fill="#ff5fa2"/></svg>
+                        <span>bKash</span>
+                        <i class="wd-tick">✓</i>
+                    </button>
+                    <button type="button" class="wd-method wd-nagad" data-method="nagad">
+                        <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#f26a21"/><circle cx="20" cy="20" r="8" fill="#fff" opacity=".9"/><circle cx="20" cy="20" r="4" fill="#e8281e"/></svg>
+                        <span>নগদ</span>
+                        <i class="wd-tick">✓</i>
+                    </button>
+                </div>
+
+                <div class="wd-label">উত্তোলনের পরিমাণ লিখুন (৳)</div>
+                <div class="wd-chips" id="wd-chips">
+                    <button type="button" data-amt="100">100</button>
+                    <button type="button" data-amt="200">200</button>
+                    <button type="button" data-amt="500">500</button>
+                    <button type="button" data-amt="1000">1,000</button>
+                    <button type="button" data-amt="2000">2,000</button>
+                    <button type="button" data-amt="5000">5,000</button>
+                </div>
+                <div class="wd-amount-row">
+                    <input type="number" id="withdraw-amount" placeholder="পরিমাণ লিখুন" min="100" inputmode="numeric">
+                    <div class="wd-amount-badge">৳<span id="wd-amount-badge">0</span></div>
+                </div>
+
+                <div class="wd-label" id="wd-account-label">বিকাশ নম্বর</div>
+                <input type="text" id="withdraw-account" class="wd-account" placeholder="একাউন্ট নম্বর (যেমন: 017xxxxxxxx)" inputmode="tel" required>
+
+                <div class="wd-summary">
+                    <div class="wd-row"><span>🎁 বোনাস ব্যালেন্স:</span><b>৳<span id="wd-bonus-bal">0.00</span></b></div>
+                    <div class="wd-row"><span>🪙 উত্তোলন যোগ্য ব্যালেন্স:</span><b>৳<span id="wd-withdrawable">0.00</span></b></div>
+                    <div class="wd-row wd-row-ok"><span><i>✓</i> আপনার উত্তোলন সম্পন্ন হবে</span><b>৳<span id="wd-final">0.00</span></b></div>
+                </div>
+
+                <div class="av-error-msg" id="withdraw-msg" style="color:#ef9a9a;"></div>
+
+                <button type="button" class="wd-submit" id="withdraw-confirm-btn">
+                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2 12 22 3l-5 18-5-7-10-2Z" fill="#fff" opacity=".95"/><path d="m12 14 10-11" stroke="#1f9d3a" stroke-width="1.5" fill="none"/></svg>
+                    <span>উত্তোলন করুন</span>
+                </button>
+
+                <div class="wd-info">
+                    <div class="wd-info-title">👑 সেরা উত্তোলন সিস্টেম</div>
+                    <ul>
+                        <li><i>✓</i>bKash ও Nagad – দুইটিই আছে</li>
+                        <li><i>✓</i>সঠিক পরিমাণে দ্রুত উত্তোলন</li>
+                        <li><i>✓</i>৬ ঘন্টা ডিপোজিট লক (নিরাপত্তার জন্য)</li>
+                        <li><i>✓</i>বোনাস টার্নওভার শেষ না হলে উত্তোলন শুধুমাত্র বোনাস থেকে</li>
+                        <li><i>✓</i>ন্যূনতম উত্তোলন: ৳100</li>
+                        <li><i>✓</i>সর্বোচ্চ উত্তোলন: সীমাহীন</li>
+                        <li><i>✓</i>উত্তোলন সময়: ১-২ মিনিট</li>
+                    </ul>
+                </div>
+
+                <div class="wd-tip">
+                    <span>💡</span>
+                    <div><b>গুরুত্বপূর্ণ পরামর্শ:</b><br>বোনাস পেলে তা সম্পূর্ণ করতে খেলুন এবং তারপর উত্তোলন করুন।</div>
+                </div>
             </div>
-            <div class="form-group">
-                <input type="number" id="withdraw-amount" placeholder="উইথড্র করার পরিমাণ" min="100">
-            </div>
-            <div class="form-group">
-                <input type="text" id="withdraw-account" placeholder="একাউন্ট নম্বর (যেমন: 017xxxxxxxx)" required>
-            </div>
-            <div class="av-error-msg" id="withdraw-msg" style="color:#ef9a9a;"></div>
-            <div style="display:flex; gap:6px; margin-top:8px;">
-                <button type="button" class="av-btn av-btn-withdraw" id="withdraw-confirm-btn" style="flex:1; padding:8px;">রিকোয়েস্ট পাঠান</button>
-                <button type="button" class="av-btn av-btn-logout" id="close-withdraw-btn" style="padding:8px;">বন্ধ</button>
-            </div>
+
+            <div class="wd-foot">🛡️ নিরাপদ, দ্রুত ও নির্ভরযোগ্য – <b>কাগজের বিমান</b></div>
         </div>
     </div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const fmt=n=>Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const modal=$('withdraw-modal'); if(!modal) return;
+  const amount=$('withdraw-amount'), select=$('withdraw-method');
+  let lastUser=null;
+
+  function setMethod(m){
+    select.value=m;
+    modal.querySelectorAll('.wd-method').forEach(b=>b.classList.toggle('active',b.dataset.method===m));
+    $('wd-account-label').textContent=(m==='nagad'?'নগদ':'বিকাশ')+' নম্বর';
+  }
+  function refreshAmount(){
+    const v=parseFloat(amount.value);
+    const ok=Number.isFinite(v)&&v>0;
+    $('wd-amount-badge').textContent=ok?v.toLocaleString('en-US'):'0';
+    $('wd-final').textContent=fmt(ok?v:0);
+    modal.querySelectorAll('#wd-chips button').forEach(b=>b.classList.toggle('sel',ok&&Number(b.dataset.amt)===v));
+  }
+  function fill(u){
+    if(u) lastUser=u;
+    const data=lastUser;
+    let bal=data?Number(data.balance||0):(typeof currentBalance==='number'?currentBalance:0);
+    let bonus=0;
+    if(data){
+      const t=data.bonusTurnover||{};
+      const left=Math.max(0,Number(t.required||0)-Number(t.completed||0));
+      if(t.status==='pending'&&left>0) bonus=Math.min(bal,Math.max(0,Number(t.claimedBonusTotal||0)));
+    }
+    $('wd-main-balance').textContent=fmt(bal);
+    $('wd-bonus-bal').textContent=fmt(bonus);
+    $('wd-withdrawable').textContent=fmt(Math.max(0,bal-bonus));
+    setMethod(select.value||'bkash');
+    refreshAmount();
+  }
+  window.gzWithdrawFillSummary=function(u){ if(u===null) lastUser=null; fill(u); };
+
+  modal.querySelectorAll('.wd-method').forEach(b=>b.addEventListener('click',()=>setMethod(b.dataset.method)));
+  modal.querySelectorAll('#wd-chips button').forEach(b=>b.addEventListener('click',()=>{ amount.value=b.dataset.amt; refreshAmount(); }));
+  amount.addEventListener('input',refreshAmount);
+  modal.addEventListener('click',e=>{ if(e.target===modal) $('close-withdraw-btn').click(); });
+  fill(null);
+})();
+</script>
 
     <!-- PAGE 1: LOBBY -->
     <div class="page-screen active" id="lobby-screen">
@@ -1921,6 +2088,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             withdrawMsg.innerText = "";
             document.getElementById('withdraw-account').value = "";
             withdrawModal.classList.remove('hidden');
+            if (window.gzWithdrawFillSummary) window.gzWithdrawFillSummary(null);
             try {
                 let snap = await db.ref('users/' + currentUser.uid).once('value');
                 let u = snap.val() || {};
@@ -1932,6 +2100,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 }
                 const turnover = u.bonusTurnover || {};
                 const turnoverLeft = Math.max(0, Number(turnover.required || 0) - Number(turnover.completed || 0));
+                if (window.gzWithdrawFillSummary) window.gzWithdrawFillSummary(u);
                 const turnoverLocked = turnover.status === 'pending' && turnoverLeft > 0;
                 const last = Number(u.lastDepositAt || 0);
                 const offset = (typeof aviatorServerTimeOffset === 'number') ? aviatorServerTimeOffset : 0;
@@ -2220,40 +2389,68 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             }
         }
 
+        function updateAuthModeUI() {
+            authTitle.innerText = isSignUp ? "CREATE ACCOUNT" : "KAGOJER BIMAN LOGIN";
+            authSubmitBtn.innerText = isSignUp ? "Create Account" : "Login";
+            toggleAuthMode.innerText = isSignUp ? "Login" : "Create Account";
+            const phoneWrap = document.getElementById('auth-phone-wrap');
+            const phoneInput = document.getElementById('auth-phone');
+            const hint = document.getElementById('auth-switch-hint');
+            if (phoneWrap) phoneWrap.style.display = isSignUp ? 'block' : 'none';
+            if (phoneInput) phoneInput.required = isSignUp;
+            if (phoneInput && !isSignUp) phoneInput.value = '';
+            if (hint) hint.innerText = isSignUp ? 'আগে থেকেই অ্যাকাউন্ট আছে?' : 'নতুন সদস্য?';
+            const passwordInput = document.getElementById('auth-password');
+            if (passwordInput) passwordInput.autocomplete = isSignUp ? 'new-password' : 'current-password';
+            authError.innerText = "";
+        }
+
         toggleAuthMode.addEventListener('click', function(e) {
             e.preventDefault();
             isSignUp = !isSignUp;
-            authTitle.innerText = isSignUp ? "CREATE ACCOUNT" : "GAMING ZONE LOGIN";
-            authSubmitBtn.innerText = isSignUp ? "Sign Up" : "Login";
-            toggleAuthMode.innerText = isSignUp ? "Already have an account? Login" : "Create Account";
-            authError.innerText = "";
+            updateAuthModeUI();
         });
 
         authSubmitBtn.addEventListener('click', function() {
             authError.innerText = "Processing...";
             const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const phone = document.getElementById('auth-phone').value.trim();
 
             if (!email || !password) {
                 authError.innerText = "Please enter both Email and Password";
                 return;
             }
+            if (isSignUp && !phone) {
+                authError.innerText = "রেজিস্ট্রেশনের জন্য ফোন নম্বর দেওয়া বাধ্যতামূলক।";
+                document.getElementById('auth-phone').focus();
+                return;
+            }
+            if (isSignUp && !/^[+0-9()\-\s]{7,20}$/.test(phone)) {
+                authError.innerText = "সঠিক ফোন নম্বর লিখুন।";
+                document.getElementById('auth-phone').focus();
+                return;
+            }
 
+            authSubmitBtn.disabled = true;
             if (isSignUp) {
                 auth.createUserWithEmailAndPassword(email, password)
                     .then(cred => db.ref('users/' + cred.user.uid).set({
-                        email, balance: 000, games: 0, wins: 0,
+                        email, phone, phoneNumber: phone, balance: 0, games: 0, wins: 0,
                         boxingKingGames: 0, boxingKingWins: 0,
                         createdAt: Date.now()
                     }))
                     .then(() => { authError.innerText = ""; })
-                    .catch(err => { authError.innerText = err.message; });
+                    .catch(err => { authError.innerText = err.message; })
+                    .finally(() => { authSubmitBtn.disabled = false; });
             } else {
                 auth.signInWithEmailAndPassword(email, password)
                     .then(() => { authError.innerText = ""; })
-                    .catch(err => { authError.innerText = err.message; });
+                    .catch(err => { authError.innerText = err.message; })
+                    .finally(() => { authSubmitBtn.disabled = false; });
             }
         });
+        updateAuthModeUI();
 
         document.getElementById('logout-btn').addEventListener('click', function() {
             auth.signOut().then(() => { window.location.reload(); });
@@ -4480,6 +4677,7 @@ function rbLockAndSpin(){
           <button type="button" class="gz-member-action" id="gz-member-account"><span>👤</span>My Account</button>
           <button type="button" class="gz-member-action" id="gz-member-bet-history"><span>📊</span>Bet History / Record</button>
         </div>
+        <button type="button" id="gz-member-logout" style="width:100%;margin-top:14px;min-height:52px;border:1px solid #ff7185;border-radius:14px;background:linear-gradient(135deg,#8d2038,#541326);color:#fff;font-weight:900;font-size:16px;padding:12px;box-shadow:0 6px 18px #0005">↪ লগ আউট</button>
       </div>
     </section>
 
@@ -4555,6 +4753,10 @@ function rbLockAndSpin(){
       document.getElementById('gz-member-home')?.addEventListener('click',()=>{closeMember();mode='hot';filter();window.scrollTo({top:0,behavior:'smooth'});document.querySelectorAll('.gz-tab').forEach(x=>x.classList.toggle('active',x.dataset.gzTab==='hot'))});
       document.getElementById('gz-member-bonus')?.addEventListener('click',()=>{closeMember();document.getElementById('bonus-btn')?.click()});
       document.getElementById('gz-member-help')?.addEventListener('click',()=>{closeMember();document.getElementById('help-center-btn')?.click()});
+      document.getElementById('gz-member-logout')?.addEventListener('click',()=>{
+        closeMember();
+        document.getElementById('logout-btn')?.click();
+      });
       const openDetail=id=>{document.getElementById(id)?.classList.add('open')};
       document.querySelectorAll('[data-close-detail]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.closeDetail)?.classList.remove('open')));
       document.querySelectorAll('.gz-detail-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
