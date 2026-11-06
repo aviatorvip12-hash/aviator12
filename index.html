@@ -1108,7 +1108,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
 @media(min-width:600px){.gz-bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(100%,520px)}}
 
 
-        /* Modern Paper Plane login/register panel — visual-only styling */
+        /* Modern Gaming Zone ED login/register panel — visual-only styling */
         .kb-auth-form{padding:18px 14px 12px;border:1px solid rgba(190,105,255,.48);border-radius:22px;background:radial-gradient(circle at 50% 0%,rgba(116,42,214,.25),transparent 48%),linear-gradient(145deg,rgba(15,8,39,.98),rgba(30,10,66,.96));box-shadow:0 0 28px rgba(160,60,255,.22),inset 0 0 22px rgba(255,255,255,.025)}
         .kb-auth-mark{width:54px;height:54px;margin:0 auto 7px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(135deg,#7c3aed,#d946ef);font-size:27px;box-shadow:0 0 22px rgba(190,70,255,.55)}
         .kb-auth-caption{text-align:center;color:#cbb4ff;font-size:10px;letter-spacing:2px;font-weight:900;margin-bottom:18px}
@@ -1158,7 +1158,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             <h2 id="auth-title">GAMING ZONE LOGIN</h2>
             <form id="auth-form" class="kb-auth-form" onsubmit="return false;">
                 <div class="kb-auth-mark">✈️</div>
-                <div class="kb-auth-caption">PAPER PLANE • MEMBER ACCESS</div>
+                <div class="kb-auth-caption">গেমিং জোন ইডি • MEMBER ACCESS</div>
                 <div class="form-group"><input type="email" id="auth-email" placeholder="Email Address" autocomplete="email" required></div>
                 <div class="form-group"><input type="password" id="auth-password" placeholder="Password" autocomplete="current-password" required></div>
                 <div class="form-group" id="auth-phone-wrap" style="display:none"><input type="tel" id="auth-phone" placeholder="Phone Number (বাধ্যতামূলক)" inputmode="tel" autocomplete="tel" maxlength="20"></div>
@@ -1265,7 +1265,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
           </div>
         </div>
 
-        <div class="wd-foot">🛡️ নিরাপদ, দ্রুত ও নির্ভরযোগ্য – <b>কাগজের বিমান</b></div>
+        <div class="wd-foot">🛡️ নিরাপদ, দ্রুত ও নির্ভরযোগ্য – <b>গেমিং জোন ইডি</b></div>
       </div>
     </div>
 
@@ -1356,7 +1356,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 </div>
             </div>
 
-            <div class="wd-foot">🛡️ নিরাপদ, দ্রুত ও নির্ভরযোগ্য – <b>কাগজের বিমান</b></div>
+            <div class="wd-foot">🛡️ নিরাপদ, দ্রুত ও নির্ভরযোগ্য – <b>গেমিং জোন ইডি</b></div>
         </div>
     </div>
 
@@ -1652,12 +1652,19 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
 
 
 
+    <style>
+      .cg-cell.scatter{box-shadow:0 0 14px 3px #ffd54a,inset 0 0 10px #ffd54a99;animation:cgScat .7s infinite alternate}
+      @keyframes cgScat{from{transform:scale(1)}to{transform:scale(1.07)}}
+      .cg-free{display:none;margin-top:7px;padding:7px 10px;border-radius:10px;border:2px solid #ffd54a;background:linear-gradient(90deg,#5b2bd6,#c9378f);color:#fff;font-weight:800;font-size:.85rem;text-align:center;box-shadow:0 0 12px #ffd54a88}
+      .cg-free b{color:#ffe27a}
+    </style>
     <!-- PAGE 4: COLOR GEMS -->
     <div class="page-screen" id="color-gems-screen">
       <div class="cg-container" id="cgGameContainer">
         <div class="cg-fs" id="cg-balance-display"><span id="cg-top-balance">0.00</span></div>
         <div class="cg-top"><div class="cg-ways">2000 WAYS</div><div class="cg-mults" id="cg-mults"><span class="active">1X</span><span>2X</span><span>3X</span><span>5X</span></div></div>
         <div class="cg-frame"><div class="cg-reels" id="cg-board"></div></div>
+        <div class="cg-free" id="cg-free">⭐ FREE SPIN • বাকি <b id="cg-free-left">0</b> • মোট জয় <b id="cg-free-win">0.00</b> কয়েন</div>
         <div class="cg-actions"><button class="cg-action" id="cg-extra-btn">⚡ Extra Bet</button><button class="cg-action buy" id="cg-buy-btn">💎 Buy Feature</button></div>
         <div class="cg-info"><div class="cg-box"><div class="cg-label">ব্যালেন্স</div><div class="cg-value" id="cg-bal">0.00</div></div><div class="cg-box"><div class="cg-label">উইন</div><div class="cg-value" id="cg-win">0.00</div></div><div class="cg-box"><div class="cg-label">মোট বেট</div><div class="cg-value" id="cg-bet">1.00</div></div></div>
         <div class="cg-status" id="cg-status">SPIN চাপুন! 💎</div>
@@ -2183,6 +2190,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     }
 
                     await requestRef.set(depositData);
+                    if (window.gzRecordTx) window.gzRecordTx('deposit', requestRef.key, depositData);
 
                     depositMsg.style.color = "#81c784";
                     depositMsg.innerText = "ডিপোজিট রিকোয়েস্ট সফলভাবে জমা হয়েছে।";
@@ -2402,6 +2410,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     debitedAt: Date.now(),
                     balanceAfterDebit: committedBalance
                 });
+                if (window.gzRecordTx) window.gzRecordTx('withdraw', requestKey, Object.assign({}, withdrawData, { status: 'pending' }));
 
                 withdrawMsg.style.color = "#81c784";
                 withdrawMsg.innerText = "উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে।";
@@ -2843,50 +2852,128 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             console.warn('Aviator crash history read failed:', error);
         });
 
-        // Automated practice participants make the lobby feel active. Their BOT tag
-        // keeps automated activity distinguishable from real players; they never touch user balances.
+        // Live bets list = You + REAL players (shared via Firebase, same on every phone)
+        // + DEMO players (generated from the round number, so every phone shows the same ones).
+        // Demo rows never touch any balance. Switch them off with GZ_SHOW_DEMO_PLAYERS below.
+        function seededRng(seed) {
+            let t = (Number(seed) * 2654435761 + 1013904223) >>> 0;
+            return function() {
+                t = (t + 0x6D2B79F5) >>> 0;
+                let r = Math.imul(t ^ (t >>> 15), 1 | t);
+                r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+                return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+        // TRIAL SWITCH: set to false before the public launch to remove all demo players (only real players will show).
+        const GZ_SHOW_DEMO_PLAYERS = true;
         let simulatedBetRound = null;
         let simulatedBets = [];
         function getSimulatedBets(roundIndex) {
             if (simulatedBetRound === Number(roundIndex) && simulatedBets.length) return simulatedBets;
             simulatedBetRound = Number(roundIndex);
+            const rnd = seededRng(roundIndex);
             const names = ['Rafi','Siam','Nabil','Tanim','Sakib','Riyad','Nayeem','Arian','Fahim','Shuvo','Mim','Nusrat'];
-            const count = 5 + Math.floor(Math.random() * 5);
+            const amountPool = [500, 600, 750, 900, 1000, 1200, 1500, 1800, 2500, 3000];
+            const targetPool = [1.25,1.4,1.55,1.7,1.85,2,2.2,2.5,3,3.5,4,5];
+            const count = 5 + Math.floor(rnd() * 5);
+            const start = Math.floor(rnd() * names.length);
             simulatedBets = [];
-            for (let i=0; i<count; i++) {
-                const amountPool = [500, 600, 750, 900, 1000, 1200, 1500, 1800, 2500, 3000];
-                const targetPool = [1.25,1.4,1.55,1.7,1.85,2,2.2,2.5,3,3.5,4,5];
-                simulatedBets.push({name:names[(i + Math.floor(Math.random()*names.length)) % names.length], amount:amountPool[Math.floor(Math.random()*amountPool.length)], target:targetPool[Math.floor(Math.random()*targetPool.length)]});
+            for (let i = 0; i < count; i++) {
+                simulatedBets.push({name: names[(start + i) % names.length], amount: amountPool[Math.floor(rnd() * amountPool.length)], target: targetPool[Math.floor(rnd() * targetPool.length)]});
             }
             return simulatedBets;
         }
 
+        const LIVE_BETS_PATH = 'aviatorGame/liveBets';
+        let liveRealBets = {}, liveWatchRound = null, liveWatchRef = null;
+        function escLive(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+        /* The name other players see = the player's username (same field "My Account" shows),
+           falling back to the email prefix. Loaded once and cached. */
+        let liveNameCache = null;
+        async function getLiveName() {
+            if (!currentUser) return 'Player';
+            const uid = currentUser.uid;
+            if (liveNameCache && liveNameCache.uid === uid) return liveNameCache.name;
+            let name = '';
+            try {
+                const d = (await db.ref('users/' + uid).once('value')).val() || {};
+                name = d.username || d.userName || d.displayName || d.nickname || d.name || '';
+            } catch (e) {}
+            if (!name && currentUser.email) name = currentUser.email.split('@')[0];
+            name = String(name || 'Player').split('@')[0].trim().slice(0, 20) || 'Player';  /* never show an email domain */
+            liveNameCache = { uid: uid, name: name };
+            return name;
+        }
+        function watchLiveBets(roundIndex) {
+            if (!currentUser) {
+                if (liveWatchRef) { liveWatchRef.off(); liveWatchRef = null; }
+                liveWatchRound = null; liveRealBets = {};
+                return;
+            }
+            const r = Number(roundIndex);
+            if (!Number.isFinite(r) || liveWatchRound === r) return;
+            getLiveName();
+            if (liveWatchRef) liveWatchRef.off();
+            liveWatchRound = r; liveRealBets = {};
+            liveWatchRef = db.ref(LIVE_BETS_PATH + '/' + r);
+            liveWatchRef.on('value', function(snap) { liveRealBets = snap.val() || {}; }, function(err) { console.warn('Live bets read failed:', err); });
+        }
+        async function publishLiveBet(roundIndex, data) {
+            try {
+                if (!currentUser) return;
+                const uid = currentUser.uid, r = Number(roundIndex);
+                const name = await getLiveName();
+                await db.ref(LIVE_BETS_PATH + '/' + r + '/' + uid).set(Object.assign({name: name, at: firebase.database.ServerValue.TIMESTAMP}, data));
+                // Tidy up this player's own older entry so the list never grows.
+                db.ref(LIVE_BETS_PATH + '/' + (r - 2) + '/' + uid).remove().catch(function() {});
+            } catch (e) { console.warn('Live bet publish failed (check Firebase Rules for aviatorGame/liveBets):', e); }
+        }
+
         function renderMyLiveBetUI(currentRoundIndex, isCrashed) {
             const rows = [];
-            const bots = getSimulatedBets(currentRoundIndex);
+            watchLiveBets(currentRoundIndex);
             const crashPoint = Number(aviatorRoundState && aviatorRoundState.crashPoint) || 1;
             const isFlyingNow = !!(aviatorRoundState && aviatorRoundState.state === 'flying');
             const liveMultiplier = isFlyingNow ? currentLocalMult : 1;
-            bots.forEach(function(bot) {
+
+            // Real players (everyone except me; my own row is added separately below)
+            if (liveWatchRound === Number(currentRoundIndex)) {
+                const myUid = currentUser && currentUser.uid;
+                Object.keys(liveRealBets).filter(function(uid) { const b = liveRealBets[uid]; return uid !== myUid && b && Number(b.amount) > 0; })
+                    .sort(function(x, y) { return Number(liveRealBets[y].amount) - Number(liveRealBets[x].amount); })
+                    .slice(0, 40)
+                    .forEach(function(uid) {
+                        const b = liveRealBets[uid];
+                        const amt = Number(b.amount) || 0;
+                        let status = '', rowClass = 'av-live-bet-row';
+                        if (b.status === 'cashed') { status = (Number(b.multiplier) || 0).toFixed(2) + 'x (' + (Number(b.payout) || 0).toFixed(2) + ' কয়েন)'; rowClass += ' cashed'; }
+                        else if (isCrashed) { status = 'CRASHED (0 কয়েন)'; rowClass += ' lost'; }
+                        else { status = 'In Flight (' + (amt * Math.max(1, liveMultiplier)).toFixed(2) + ' কয়েন)'; }
+                        rows.push('<div class="'+rowClass+'"><span>'+escLive(b.name || 'Player')+'</span><span>'+amt+' কয়েন</span><span>'+status+'</span></div>');
+                    });
+            }
+
+            // Demo players (identical on every phone)
+            (GZ_SHOW_DEMO_PLAYERS ? getSimulatedBets(currentRoundIndex) : []).forEach(function(bot) {
                 const didCash = crashPoint >= bot.target && (isCrashed || (isFlyingNow && currentLocalMult >= bot.target));
                 const didLose = isCrashed && !didCash;
                 let status = '';
                 let rowClass = 'av-live-bet-row';
-                if (didCash) { status = bot.target.toFixed(2) + 'x (' + (bot.amount * bot.target).toFixed(2) + ' কয়েন)'; rowClass += ' cashed'; }
-                else if (didLose) { status = 'CRASHED (0 কয়েন)'; rowClass += ' lost'; }
-                else { status = 'In Flight (' + (bot.amount * Math.max(1, liveMultiplier)).toFixed(2) + ' কয়েন)'; }
-                rows.push('<div class="'+rowClass+'"><span>'+bot.name+'</span><span>'+bot.amount+' কয়েন</span><span>'+status+'</span></div>');
+                if (didCash) { status = bot.target.toFixed(2) + 'x (' + (bot.amount * bot.target).toFixed(2) + ' কয়েন)'; rowClass += ' cashed'; }
+                else if (didLose) { status = 'CRASHED (0 কয়েন)'; rowClass += ' lost'; }
+                else { status = 'In Flight (' + (bot.amount * Math.max(1, liveMultiplier)).toFixed(2) + ' কয়েন)'; }
+                rows.push('<div class="'+rowClass+'"><span>'+bot.name+'</span><span>'+bot.amount+' কয়েন</span><span>'+status+'</span></div>');
             });
 
             const hasActiveBetThisRound = (betRoundIndex === currentRoundIndex) && !!currentUser;
             if (hasActiveBetThisRound) {
-                const nameDisplay = currentUser.email ? currentUser.email.split('@')[0] : 'You';
+                const nameDisplay = (liveNameCache && liveNameCache.uid === currentUser.uid) ? liveNameCache.name : (currentUser.email ? currentUser.email.split('@')[0] : 'You');
                 let statusText = '';
                 let rowClass = 'av-live-bet-row';
-                if (hasCashedOut) { statusText = cashedMultiplier.toFixed(2) + 'x (' + cashedAmount.toFixed(2) + ' কয়েন)'; rowClass += ' cashed'; }
-                else if (isCrashed) { statusText = 'CRASHED (0 কয়েন)'; rowClass += ' lost'; }
-                else { statusText = 'In Flight (' + (activeBet * currentLocalMult).toFixed(2) + ' কয়েন)'; }
-                rows.unshift('<div class="'+rowClass+'"><span>'+nameDisplay+' (You)</span><span>'+activeBet+' কয়েন</span><span>'+statusText+'</span></div>');
+                if (hasCashedOut) { statusText = cashedMultiplier.toFixed(2) + 'x (' + cashedAmount.toFixed(2) + ' কয়েন)'; rowClass += ' cashed'; }
+                else if (isCrashed) { statusText = 'CRASHED (0 কয়েন)'; rowClass += ' lost'; }
+                else { statusText = 'In Flight (' + (activeBet * currentLocalMult).toFixed(2) + ' কয়েন)'; }
+                rows.unshift('<div class="'+rowClass+'"><span>'+escLive(nameDisplay)+' (You)</span><span>'+activeBet+' কয়েন</span><span>'+statusText+'</span></div>');
             }
             liveBetsList.innerHTML = rows.join('');
         }
@@ -3166,6 +3253,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     if (result.committed) {
                         if (typeof window.gzRecordBonusTurnover === 'function') window.gzRecordBonusTurnover(betAmt, 'Aviator');
                         syncLocalAviatorBet(currentRoundIndex, (result.snapshot.val().aviatorBets || {})[roundKey]);
+                        publishLiveBet(currentRoundIndex, {amount: Number(betAmt.toFixed(2)), status: 'active'});
                         betBtn.innerText = 'বেট প্লেসড';
                         betBtn.className = 'av-btn av-btn-action av-btn-waiting';
                         betBtn.disabled = true;
@@ -3224,6 +3312,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     const bet = (data.aviatorBets || {})[roundKey];
                     if (result.committed && bet && bet.status === 'cashed') {
                         syncLocalAviatorBet(currentRoundIndex, bet);
+                        publishLiveBet(currentRoundIndex, {amount: Number(bet.amount) || 0, status: 'cashed', multiplier: Number(bet.multiplier) || 0, payout: Number(bet.payout) || 0});
                         cashoutBannerContainer.innerHTML = '<div class="av-cashout-banner">CASHED OUT ' + Number(bet.payout).toFixed(2) + ' কয়েন (' + Number(bet.multiplier).toFixed(2) + 'x)</div>';
                     } else if (bet && bet.status === 'lost') {
                         syncLocalAviatorBet(currentRoundIndex, bet);
@@ -4029,10 +4118,71 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
 
 
 /* COLOR GEMS — same lobby/auth/shared-wallet/admin-control pattern as Boxing King */
-        const CG_ITEMS=['🔴','🟠','🟡','🟢','🔵','🟣','💎'];
+        const CG_ITEMS=['🔴','🟡','🟢','🔵','🟣','💎'];
+        /* One symbol (🟠) was removed, which makes wins far more frequent. Measured by simulation:
+           average return 0.714x → 1.221x per spin. This scale brings the return back to the previous level. */
+        const CG_SYMBOL_PAYOUT_SCALE=0.585;
         let CG_BET_OPTIONS=[1,2,3,5,10],cgBetIndex=0,cgSpinning=false,cgAuto=false,cgAutoTimer=null,cgBoardState=Array(25).fill(''),cgWin=0,cgMultiplierIndex=0;
         /* Color Gems multiplier sequence follows Boxing King's 1X → 2X → 3X → 5X. */
         const CG_MULTS=[1,2,3,5];
+
+        /* ===== Scatter / Free Spin (admin-controlled via config/colorGems) ===== */
+        const CG_SCATTER='⭐';
+        const CG_SCATTER_DEFAULTS={enabled:true,chancePct:0.7,freeSpins:10,retrigger:5,winMult:3,maxSpins:30,maxWinX:50};
+        let cgScatterCfg=Object.assign({},CG_SCATTER_DEFAULTS);
+        let cgScatterHit=false;
+        /* Each of the 25 cells gets a scatter independently with probability p. p is solved so that
+           P(3 or more scatters in a round) equals the admin's chance exactly. So 1–2 scatters show up
+           naturally now and then, and Free Spin still starts at exactly the configured rate. */
+        let cgCellPCache={chance:null,p:0};
+        function cgTail3(p){const q=1-p;const p0=Math.pow(q,25),p1=25*p*Math.pow(q,24),p2=300*p*p*Math.pow(q,23);return 1-(p0+p1+p2)}
+        function cgSolveCellP(chancePct){
+            if(cgCellPCache.chance===chancePct)return cgCellPCache.p;
+            const target=Math.min(0.1,Math.max(0,chancePct/100));
+            let lo=0,hi=0.5;
+            for(let i=0;i<60;i++){const mid=(lo+hi)/2;if(cgTail3(mid)<target)lo=mid;else hi=mid}
+            cgCellPCache={chance:chancePct,p:target>0?(lo+hi)/2:0};
+            return cgCellPCache.p;
+        }
+        let cgFree={active:false,left:0,done:0,bet:1,sessionWin:0};
+        function cgReadScatterCfg(c){
+            c=c||{};
+            const n=(v,d,min,max)=>{v=Number(v);return Number.isFinite(v)?Math.min(max,Math.max(min,v)):d};
+            return {
+                enabled:c.scatterEnabled!==false,
+                chancePct:n(c.scatterChancePct,CG_SCATTER_DEFAULTS.chancePct,0,10),
+                freeSpins:Math.round(n(c.scatterFreeSpins,CG_SCATTER_DEFAULTS.freeSpins,1,50)),
+                retrigger:Math.round(n(c.scatterRetrigger,CG_SCATTER_DEFAULTS.retrigger,0,20)),
+                winMult:n(c.scatterWinMult,CG_SCATTER_DEFAULTS.winMult,1,5),
+                maxSpins:Math.round(n(c.scatterMaxSpins,CG_SCATTER_DEFAULTS.maxSpins,1,100)),
+                maxWinX:n(c.scatterMaxWinX,CG_SCATTER_DEFAULTS.maxWinX,1,500)
+            };
+        }
+        db.ref('config/colorGems').on('value',snap=>{cgScatterCfg=cgReadScatterCfg(snap.val())},err=>console.warn('Color Gems config read failed:',err));
+        function cgUpdateFreeBadge(){
+            const box=document.getElementById('cg-free');if(!box)return;
+            box.style.display=cgFree.active?'block':'none';
+            const l=document.getElementById('cg-free-left'),w=document.getElementById('cg-free-win');
+            if(l)l.textContent=cgFree.left;if(w)w.textContent=cgFmt(cgFree.sessionWin);
+        }
+        function cgEndFree(){
+            const total=cgFree.sessionWin;
+            cgFree.active=false;cgFree.left=0;
+            cgWin=total;updateCgUI();cgUpdateFreeBadge();
+            cgSetStatus('⭐ Free Spin শেষ! মোট জয়: '+cgFmt(total)+' কয়েন','#ffcc00');
+            cgSpinning=false;setCgControls(!cgConfig.enabled);
+            if(cgAuto)cgAutoTimer=setTimeout(handleCgSpin,1800);
+        }
+        function cgRunFreeSpin(){
+            if(!cgFree.active)return;
+            if(cgFree.left<=0){cgEndFree();return}
+            cgFree.left--;cgFree.done++;
+            cgSpinning=true;setCgControls(true);
+            cgWin=0;cgMultiplierIndex=0;updateCgMult();updateCgUI();cgUpdateFreeBadge();
+            cgSetStatus('⭐ FREE SPIN '+cgFree.done+' • জয় '+cgScatterCfg.winMult+'x','#ffe27a');
+            document.querySelectorAll('.cg-cell').forEach(c=>c.classList.remove('winner','rolling'));
+            startCgSpinSequence(cgFree.bet);
+        }
         /* Color Gems uses the same cascade/stop principle as Boxing King.
            No artificial win-rate/forced-win result is used. A spin only wins when
            a valid same-symbol path starts in column 1 and reaches column 3. */
@@ -4042,7 +4192,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         function cgIdx(r,c){return r*5+c}
         function cgGet(r,c){return cgBoardState[cgIdx(r,c)]}
         function cgSet(r,c,sym){cgBoardState[cgIdx(r,c)]=sym;const cell=document.getElementById('cg-cell-'+cgIdx(r,c));if(cell)cell.querySelector('.cg-symbol').textContent=sym}
-        function cgRenderBoard(){for(let i=0;i<25;i++){const cell=document.getElementById('cg-cell-'+i);if(cell)cell.querySelector('.cg-symbol').textContent=cgBoardState[i]}}
+        function cgRenderBoard(){for(let i=0;i<25;i++){const cell=document.getElementById('cg-cell-'+i);if(cell){cell.querySelector('.cg-symbol').textContent=cgBoardState[i];cell.classList.toggle('scatter',cgBoardState[i]===CG_SCATTER)}}}
         function initCgBoard(){if(!cgBoard)return;cgBoard.innerHTML='';for(let i=0;i<25;i++){const c=document.createElement('div');c.className='cg-cell';c.id='cg-cell-'+i;const s=document.createElement('span');s.className='cg-symbol';s.textContent=cgRand();c.appendChild(s);cgBoard.appendChild(c);cgBoardState[i]=s.textContent}}
         function updateCgUI(){const b=document.getElementById('cg-bal'),w=document.getElementById('cg-win'),bet=document.getElementById('cg-bet');if(b)b.innerText=cgFmt(currentBalance);if(w)w.innerText=cgFmt(cgWin);if(bet)bet.innerText=cgFmt(CG_BET_OPTIONS[cgBetIndex]||1)}
         function updateCgMult(){document.querySelectorAll('#cg-mults span').forEach((e,i)=>e.classList.toggle('active',i===cgMultiplierIndex))}
@@ -4116,6 +4266,16 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                winning result. The cascade evaluator decides whether the spin
                wins or stops, exactly from the symbols that landed. */
             for(let i=0;i<25;i++) cgBoardState[i]=cgRand();
+            /* Scatter: every cell is checked independently (same chance in every round).
+               3 or more scatters = Free Spin. 1–2 scatters can appear too, with no bonus.
+               Scatters never form winning lines. */
+            cgScatterHit=false;
+            if(cgScatterCfg.enabled && cgScatterCfg.chancePct>0){
+                const cellP=cgSolveCellP(cgScatterCfg.chancePct);
+                let count=0;
+                for(let i=0;i<25;i++){if(Math.random()<cellP){cgBoardState[i]=CG_SCATTER;count++}}
+                cgScatterHit=count>=3;
+            }
             cgRenderBoard();
         }
 
@@ -4132,7 +4292,8 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             cgAnimateWin(result.indices);
             const mult=CG_MULTS[Math.min(cascadeNo-1,CG_MULTS.length-1)];
             const factor=Number(cgConfig.rtpFactor)>0?Number(cgConfig.rtpFactor):1;
-            const stepWin=+(activeBet*mult*Math.max(1,result.indices.length/3)*factor*0.5).toFixed(2);
+            const freeScale=cgFree.active?cgScatterCfg.winMult:1;
+            const stepWin=+(activeBet*mult*Math.max(1,result.indices.length/3)*factor*0.5*freeScale*CG_SYMBOL_PAYOUT_SCALE).toFixed(2);
             totalWin=+(totalWin+stepWin).toFixed(2);
             cgWin=totalWin;
             updateCgUI();
@@ -4151,7 +4312,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         }
 
         function handleCgSpin(){
-            if(cgSpinning)return;
+            if(cgSpinning||cgFree.active)return;
             if(!currentUser)return alert('প্রথমে Login করুন!');
             if(!cgConfig.enabled){cgSetStatus('গেমটি বর্তমানে বন্ধ আছে 🚧','#ff9900');return}
             const activeBet=Number(CG_BET_OPTIONS[cgBetIndex]||1);
@@ -4190,17 +4351,48 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         }
 
         function finishCgSpin(activeBet,totalWin){
-            const factor=Number(cgConfig.rtpFactor)>0?Number(cgConfig.rtpFactor):1;
-            cgWin=+Number(totalWin||0).toFixed(2);
+            const isFree=cgFree.active;
+            let win=+Number(totalWin||0).toFixed(2);
+            if(isFree){
+                /* Safety cap for one Free Spin session (admin: maxWinX × triggering bet). */
+                const cap=+(cgScatterCfg.maxWinX*cgFree.bet).toFixed(2);
+                const room=Math.max(0,+(cap-cgFree.sessionWin).toFixed(2));
+                if(win>room)win=room;
+            }
+            cgWin=win;
             if(cgWin>0){
-                cgSetStatus('💰 চেইন শেষ! মোট উইন: '+cgFmt(cgWin)+' কয়েন','#ffcc00');
+                cgSetStatus((isFree?'⭐ Free Spin উইন: ':'💰 চেইন শেষ! মোট উইন: ')+cgFmt(cgWin)+' কয়েন','#ffcc00');
                 if(!cgConfig.testMode)db.ref('users/'+currentUser.uid+'/balance').transaction(v=>Number(v||0)+cgWin);
                 if(!cgConfig.testMode)db.ref('users/'+currentUser.uid+'/colorGemsWins').transaction(v=>(v||0)+1);
-            }else{
-                cgMultiplierIndex=0;updateCgMult();cgSetStatus('আবার চেষ্টা করুন ❌','#ff6666');
+                if(isFree)cgFree.sessionWin=+(cgFree.sessionWin+cgWin).toFixed(2);
+            }else if(!cgScatterHit){
+                cgMultiplierIndex=0;updateCgMult();
+                cgSetStatus(isFree?'Free Spin: এবার জয় নেই':'আবার চেষ্টা করুন ❌','#ff6666');
             }
-            if(!cgConfig.testMode)db.ref('users/'+currentUser.uid+'/colorGemsGames').transaction(v=>(v||0)+1);
+            if(!isFree&&!cgConfig.testMode)db.ref('users/'+currentUser.uid+'/colorGemsGames').transaction(v=>(v||0)+1);
             updateCgUI();
+
+            if(cgScatterHit){
+                cgScatterHit=false;
+                if(isFree){
+                    const total=cgFree.done+cgFree.left;
+                    const add=Math.max(0,Math.min(cgScatterCfg.retrigger,cgScatterCfg.maxSpins-total));
+                    cgFree.left+=add;
+                    cgSetStatus(add>0?'⭐⭐⭐ নতুন Scatter! +'+add+' Free Spin':'⭐⭐⭐ Scatter! (Free Spin সর্বোচ্চ সীমায় পৌঁছেছে)','#ffe27a');
+                }else{
+                    cgFree={active:true,left:cgScatterCfg.freeSpins,done:0,bet:activeBet,sessionWin:0};
+                    cgSetStatus('⭐⭐⭐ ৩টি Scatter! '+cgScatterCfg.freeSpins+'টি Free Spin শুরু হচ্ছে • জয় '+cgScatterCfg.winMult+'x','#ffe27a');
+                }
+                cgUpdateFreeBadge();
+                setTimeout(cgRunFreeSpin,2000);   /* controls stay locked during the session */
+                return;
+            }
+            if(isFree){
+                cgUpdateFreeBadge();
+                if(cgFree.left>0){setTimeout(cgRunFreeSpin,1300);return}
+                cgEndFree();
+                return;
+            }
             cgSpinning=false;setCgControls(!cgConfig.enabled);
             if(cgAuto)cgAutoTimer=setTimeout(handleCgSpin,900);
         }
@@ -4854,6 +5046,7 @@ function rbLockAndSpin(){
           <button type="button" class="gz-member-action" id="gz-member-help"><span>🆘</span>Help Center</button>
           <button type="button" class="gz-member-action" id="gz-member-account"><span>👤</span>My Account</button>
           <button type="button" class="gz-member-action" id="gz-member-bet-history"><span>📊</span>Bet History / Record</button>
+          <button type="button" class="gz-member-action" id="gz-member-tx"><span>💳</span>Deposit &amp; Withdraw Record</button>
         </div>
         <button type="button" id="gz-member-logout" style="width:100%;margin-top:14px;min-height:52px;border:1px solid #ff7185;border-radius:14px;background:linear-gradient(135deg,#8d2038,#541326);color:#fff;font-weight:900;font-size:16px;padding:12px;box-shadow:0 6px 18px #0005">↪ লগ আউট</button>
       </div>
@@ -4887,6 +5080,60 @@ function rbLockAndSpin(){
         <div id="gz-bet-history-content">লোড হচ্ছে…</div>
       </div>
     </section>
+
+    <style>
+      #tx-modal{background:radial-gradient(circle at 50% 0%,rgba(90,60,220,.35),rgba(5,4,25,.94) 70%);padding:10px}
+      #tx-modal .tx-card{width:100%;max-width:460px;max-height:94vh;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:linear-gradient(180deg,#1c1760,#0d0a33 60%,#0a0828);border:2px solid #4a3fd0;box-shadow:0 0 34px rgba(120,90,255,.45),inset 0 0 24px rgba(0,0,0,.5);color:#f2f0ff}
+      #tx-modal .tx-head{display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(90deg,#8a3dff,#5b2bd6);border-bottom:2px solid #b79bff55}
+      #tx-modal .tx-head h2{flex:1;margin:0;font-size:1.1rem;font-weight:800;color:#fff}
+      #tx-modal .tx-close{width:34px;height:34px;border-radius:50%;border:1px solid #ffffff44;background:rgba(0,0,0,.28);color:#fff;font-size:1rem;cursor:pointer}
+      #tx-modal .tx-body{padding:12px 14px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+      #tx-modal .tx-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      #tx-modal .tx-stat{padding:10px;border-radius:14px;text-align:center;background:#120e45;border:2px solid #3b3a8f}
+      #tx-modal .tx-stat small{display:block;font-size:.75rem;color:#b9b6f0}
+      #tx-modal .tx-stat b{font-size:1.3rem}
+      #tx-modal .tx-stat.dep b{color:#2ee06a}#tx-modal .tx-stat.wit b{color:#ffb347}
+      #tx-modal .tx-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+      #tx-modal .tx-tabs button{padding:9px 0;border-radius:10px;border:2px solid #3b3a8f;background:linear-gradient(#25236e,#16144d);color:#fff;font-weight:700;font-size:.9rem;cursor:pointer}
+      #tx-modal .tx-tabs button.on{border-color:#ffd23f;color:#ffd23f;box-shadow:0 0 10px #ffd23f55}
+      #tx-modal .tx-note{margin:0 0 10px;padding:8px 10px;border-radius:10px;border:1px dashed #ffc928;background:#0b0828;font-size:.78rem;line-height:1.5;color:#e6e4ff}
+      #tx-modal .tx-item{margin:9px 0;padding:11px 12px;border-radius:14px;border:2px solid #3b3a8f;background:linear-gradient(#17145a,#0d0a38)}
+      #tx-modal .tx-item.dep{border-left:5px solid #2ee06a}#tx-modal .tx-item.wit{border-left:5px solid #ffb347}
+      #tx-modal .tx-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+      #tx-modal .tx-title{font-weight:800;font-size:.98rem}
+      #tx-modal .tx-amt{font-weight:900;font-size:1.15rem}
+      #tx-modal .tx-amt.dep{color:#2ee06a}#tx-modal .tx-amt.wit{color:#ff8585}
+      #tx-modal .tx-mid{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:8px}
+      #tx-modal .tx-chip{padding:3px 10px;border-radius:99px;font-size:.74rem;font-weight:800;color:#07051f}
+      #tx-modal .tx-chip.pending{background:#ffd23f}#tx-modal .tx-chip.ok{background:#2ee06a}#tx-modal .tx-chip.bad{background:#ff7a8a}#tx-modal .tx-chip.rev{background:#b9b6f0}
+      #tx-modal .tx-meta{margin-top:7px;font-size:.78rem;line-height:1.6;color:#c9c6ff;overflow-wrap:anywhere}
+      #tx-modal .tx-meta .tx-exp{color:#ffb347}
+      #tx-modal .tx-empty{padding:26px 10px;text-align:center;color:#c9c6ff;font-size:.92rem}
+      #tx-modal .tx-foot{padding:10px 12px;text-align:center;font-size:.85rem;background:#0a0828;border-top:2px solid #3b3a8f}
+    </style>
+    <div class="av-modal-overlay hidden" id="tx-modal">
+      <div class="tx-card" role="dialog" aria-modal="true" aria-labelledby="tx-title">
+        <div class="tx-head">
+          <span style="font-size:1.5rem" aria-hidden="true">💳</span>
+          <h2 id="tx-title">ডিপোজিট ও উইথড্র রেকর্ড</h2>
+          <button type="button" class="tx-close" id="tx-close" aria-label="বন্ধ করুন">✕</button>
+        </div>
+        <div class="tx-body">
+          <div class="tx-stats">
+            <div class="tx-stat dep"><small>ডিপোজিট রিকোয়েস্ট</small><b id="tx-count-dep">০</b></div>
+            <div class="tx-stat wit"><small>উইথড্র রিকোয়েস্ট</small><b id="tx-count-wit">০</b></div>
+          </div>
+          <div class="tx-tabs" id="tx-tabs">
+            <button type="button" class="on" data-f="all">সব</button>
+            <button type="button" data-f="deposit">ডিপোজিট</button>
+            <button type="button" data-f="withdraw">উইথড্র</button>
+          </div>
+          <div class="tx-note">🗓️ শুধু শেষ ৭ দিনের রেকর্ড দেখানো হয়। ৭ দিন পার হলে পুরোনো রেকর্ড স্বয়ংক্রিয়ভাবে মুছে যায়।</div>
+          <div id="tx-list">লোড হচ্ছে…</div>
+        </div>
+        <div class="tx-foot">🛡️ নিরাপদ, দ্রুত ও নির্ভরযোগ্য – <b style="color:#ffc928">গেমিং জোন ইডি</b></div>
+      </div>
+    </div>
 
     <nav class="gz-bottom-nav" aria-label="Main navigation">
       <button class="gz-nav active" data-gz-nav="home"><span>⌂</span>Home</button>
@@ -5002,6 +5249,87 @@ function rbLockAndSpin(){
         }catch(e){box.textContent='বেট রেকর্ড লোড/পরিষ্কার করা যায়নি। Firebase সংযোগ ও Database Rules পরীক্ষা করুন।';}
       }
       document.getElementById('gz-member-bet-history')?.addEventListener('click',()=>{closeMember();openDetail('gz-bet-history-modal');loadBetHistory()});
+      // ===== Deposit & Withdraw record (kept 7 days, then auto-deleted) =====
+      // Per-user copy at users/{uid}/txRecords/{requestId}. Admin queues (adminRequests/*) are never touched.
+      const TX_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+      const bnNum = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+      let txCache = [], txFilter = 'all';
+      async function cleanExpiredTx(uid){
+        if(!uid) return;
+        const ref = db.ref('users/'+uid+'/txRecords');
+        const snap = await ref.once('value');
+        const cutoff = Date.now() - TX_TTL_MS, patch = {};
+        Object.entries(snap.val()||{}).forEach(([k,r])=>{ if(!(Number(r && r.timestamp) >= cutoff)) patch[k] = null; });
+        if(Object.keys(patch).length) await ref.update(patch);
+      }
+      window.gzRecordTx = function(type, key, data){
+        try{
+          if(!currentUser || !key || !data) return;
+          const uid = currentUser.uid;
+          const rec = { type, requestId: key, amount: Number(data.amount)||0, method: String(data.method||''), status: String(data.status||'pending').toLowerCase(), timestamp: Number(data.timestamp)||Date.now() };
+          if(type==='deposit') rec.trxId = String(data.trxId||''); else rec.accountNo = String(data.accountNo||'');
+          db.ref('users/'+uid+'/txRecords/'+key).set(rec).then(()=>cleanExpiredTx(uid)).catch(e=>console.warn('Record save failed:',e));
+        }catch(e){ console.warn('Record save failed:',e); }
+      };
+      function txStatus(st, r){
+        st = String(st||'pending').toLowerCase();
+        if(['approved','completed','complete','success','paid','done'].includes(st)) return ['সফল','ok'];
+        if(['rejected','error','failed','cancelled','canceled','declined'].includes(st)) return [(r && r.type==='withdraw' && r.refunded) ? 'বাতিল • টাকা ফেরত' : 'বাতিল','bad'];
+        if(st==='reviewed') return ['রিভিউ সম্পন্ন','rev'];
+        if(st==='processing') return ['প্রক্রিয়াধীন','pending'];
+        return ['অপেক্ষমাণ','pending'];
+      }
+      function txDate(ts){
+        try{ return new Date(ts).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){ return '—'; }
+      }
+      function renderTx(){
+        const list = document.getElementById('tx-list');
+        const deps = txCache.filter(r=>r.type==='deposit').length, wits = txCache.filter(r=>r.type==='withdraw').length;
+        document.getElementById('tx-count-dep').textContent = bnNum(deps);
+        document.getElementById('tx-count-wit').textContent = bnNum(wits);
+        const items = txCache.filter(r => txFilter==='all' || r.type===txFilter);
+        if(!items.length){ list.innerHTML = '<div class="tx-empty">গত ৭ দিনে কোনো রেকর্ড নেই।</div>'; return; }
+        list.innerHTML = items.map(r=>{
+          const dep = r.type==='deposit', cls = dep?'dep':'wit';
+          const [label, chip] = txStatus(r.status, r);
+          const method = r.method==='nagad' ? 'নগদ (Nagad)' : 'বিকাশ (bKash)';
+          const daysLeft = Math.max(1, Math.ceil((Number(r.timestamp)+TX_TTL_MS-Date.now())/86400000));
+          const exp = daysLeft<=1 ? '২৪ ঘণ্টার মধ্যে মুছে যাবে' : bnNum(daysLeft)+' দিন পর মুছে যাবে';
+          const ref = dep ? 'TrxID: '+safeText(r.trxId||'—') : 'একাউন্ট: '+safeText(r.accountNo||'—');
+          return '<div class="tx-item '+cls+'"><div class="tx-top"><span class="tx-title">'+(dep?'➕ ডিপোজিট':'📤 উইথড্র')+'</span><span class="tx-amt '+cls+'">'+(dep?'+':'−')+'৳'+(Number(r.amount)||0).toLocaleString('en-US')+'</span></div>'
+            +'<div class="tx-mid"><span style="font-size:.85rem">'+method+'</span><span class="tx-chip '+chip+'">'+label+'</span></div>'
+            +'<div class="tx-meta">'+ref+'<br>'+safeText(txDate(r.timestamp))+' • <span class="tx-exp">'+exp+'</span></div></div>';
+        }).join('');
+      }
+      async function loadTxRecords(){
+        const list = document.getElementById('tx-list');
+        if(!currentUser){ list.innerHTML = '<div class="tx-empty">রেকর্ড দেখতে প্রথমে লগইন করুন।</div>'; return; }
+        const uid = currentUser.uid, base = 'users/'+uid+'/txRecords';
+        list.textContent = 'রেকর্ড লোড হচ্ছে…';
+        try{
+          await cleanExpiredTx(uid);
+          if(!currentUser || currentUser.uid!==uid) return;
+          const snap = await db.ref(base).once('value');
+          txCache = Object.entries(snap.val()||{}).map(([key,r])=>Object.assign({key},r||{}))
+            .filter(r=>Number(r.timestamp) >= Date.now()-TX_TTL_MS)
+            .sort((a,b)=>(Number(b.timestamp)||0)-(Number(a.timestamp)||0));
+          // Refresh statuses of open requests from the admin queue (read-only).
+          await Promise.all(txCache.filter(r=>['pending','processing'].includes(String(r.status||'pending').toLowerCase()) && r.requestId).map(async r=>{
+            try{
+              const q = await db.ref('adminRequests/'+(r.type==='deposit'?'deposits':'withdrawals')+'/'+r.requestId).once('value');
+              const v = q.val();
+              const ns = v ? (v.status ? String(v.status).toLowerCase() : null) : 'reviewed';
+              if(ns && ns!==String(r.status||'').toLowerCase()){ r.status = ns; db.ref(base+'/'+r.key+'/status').set(ns).catch(()=>{}); }
+            }catch(e){}
+          }));
+          renderTx();
+        }catch(e){ list.innerHTML = '<div class="tx-empty">রেকর্ড লোড করা যায়নি। Firebase সংযোগ ও Database Rules পরীক্ষা করুন।</div>'; }
+      }
+      const txModal = document.getElementById('tx-modal');
+      document.getElementById('gz-member-tx')?.addEventListener('click',()=>{ closeMember(); txFilter='all'; document.querySelectorAll('#tx-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.f==='all')); txModal.classList.remove('hidden'); loadTxRecords(); });
+      document.getElementById('tx-close')?.addEventListener('click',()=>txModal.classList.add('hidden'));
+      txModal?.addEventListener('click',e=>{ if(e.target===txModal) txModal.classList.add('hidden'); });
+      document.querySelectorAll('#tx-tabs button').forEach(b=>b.addEventListener('click',()=>{ txFilter=b.dataset.f; document.querySelectorAll('#tx-tabs button').forEach(x=>x.classList.toggle('on',x===b)); renderTx(); }));
       document.querySelectorAll('.gz-nav').forEach(b=>b.addEventListener('click',()=>{
         document.querySelectorAll('.gz-nav').forEach(x=>x.classList.toggle('active',x===b));
         const n=b.dataset.gzNav;
