@@ -4863,7 +4863,7 @@ function rbLockAndSpin(){
       const multiplier=await loadTurnoverMultiplier();
       let claimedAmount=0;
       const result=await userRef.transaction(u=>{
-        if(u===null) return u; // first pass has no cached data; returning null makes Firebase retry with real server data
+        if(!u) return;
         const bonuses=u.bonuses||{};
         const b=bonuses[bonusId];
         if(!b || b.status!=="pending") return;
