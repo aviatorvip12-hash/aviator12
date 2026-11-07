@@ -4862,7 +4862,14 @@ function rbLockAndSpin(){
       const now=bonusNow();
       const multiplier=await loadTurnoverMultiplier();
       let claimedAmount=0;
-      const result=await userRef.transaction(u=>{
+      const preSnap=await userRef.once("value");
+      const preUser=preSnap.val();
+      let txFirst=true;
+      const result=await userRef.transaction(cached=>{
+        // First pass: Firebase's local cache can be null or partial (e.g. only balance), which used to abort the claim.
+        // Start from the freshly fetched user data instead; Firebase verifies it against the server and retries with real data if needed.
+        let u=cached;
+        if(txFirst){ txFirst=false; u=preUser; }
         if(!u) return;
         const bonuses=u.bonuses||{};
         const b=bonuses[bonusId];
@@ -4881,7 +4888,7 @@ function rbLockAndSpin(){
         const completed=Math.min(required,oldCompleted);
         const turnover= {required,completed,remaining:Number(Math.max(0,required-completed).toFixed(2)),status:completed>=required?'complete':'pending',multiplier,claimedBonusTotal:Number((Number(oldT.claimedBonusTotal||0)+amount).toFixed(2)),updatedAt:now};
         return Object.assign({},u,{balance:Number(u.balance||0)+amount,bonuses:nextBonuses,bonusTurnover:turnover});
-      });
+      },undefined,false);
       if(!result.committed){
         alert("এই bonus আর claim করা যাচ্ছে না।");
         return renderBonuses();
