@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gaming Zone - Professional Game Lobby</title>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://ff-to-gaming-4ea1b-default-rtdb.firebaseio.com" crossorigin>
+    <script>
+    /* Low-RAM / slow-phone detection (<=2 GB RAM or <=4 CPU cores). Add ?lite=1 or ?lite=0 to the address to force it on or off. */
+    (function(){try{var m=navigator.deviceMemory,c=navigator.hardwareConcurrency,q=/[?&]lite=(0|1)/.exec(location.search);
+    var lite=q?q[1]==='1':((m&&m<=2)||(c&&c<=4));if(lite)document.documentElement.classList.add('gz-lite');}catch(e){}})();
+    </script>
+    <style>
+      /* Lite mode: drop the effects that cost the most on weak GPUs. Game logic is untouched. */
+      html.gz-lite *, html.gz-lite *::before, html.gz-lite *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; text-shadow: none !important; }
+      html.gz-lite .cg-cell.scatter, html.gz-lite .wheel.rb-result-glow { animation: none !important; }
+      html.gz-lite .lobby-header { background: rgb(3,58,62) !important; }
+      html.gz-lite .av-modal-overlay { background: rgba(0,0,0,.95) !important; }
+      html.gz-lite #gz-member-panel { background: rgba(0,20,27,.97) !important; }
+    </style>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1779,6 +1794,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             document.querySelector('.gz-bottom-nav')?.classList.add('game-hidden');
 
             if (screenId === 'aviator-game-screen') {
+                gzKickAviatorLoop();
                 setTimeout(resizeCanvas, 150);
                 // Recalculate after the navigation has been hidden so the canvas gets the extra space.
                 setTimeout(resizeCanvas, 250);
@@ -1864,11 +1880,29 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             aviatorLoopRunning = false;
             setAviatorConnectionUI(false);
         }
+        /* The shared round clock must keep running (crash history + bet settlement live in the loop),
+           but drawing is only needed while the Aviator screen is open. Away from it the loop idles
+           at 4 checks per second without touching the canvas or the DOM. */
+        let gzAviatorTimer = null;
+        function gzAviatorVisible() {
+            const s = document.getElementById('aviator-game-screen');
+            return !document.hidden && !!(s && s.classList.contains('active'));
+        }
+        function gzScheduleAviatorFrame() {
+            if (document.hidden || gzAviatorVisible()) { requestAnimationFrame(masterGameLoop); return; }
+            clearTimeout(gzAviatorTimer);
+            gzAviatorTimer = setTimeout(function() { gzAviatorTimer = null; masterGameLoop(); }, 250);
+        }
+        function gzKickAviatorLoop() {
+            if (gzAviatorTimer === null) return;
+            clearTimeout(gzAviatorTimer); gzAviatorTimer = null;
+            if (aviatorLoopRunning) masterGameLoop();
+        }
         function startAviatorLoopIfOnline() {
             if (!isAviatorOnline() || aviatorLoopRunning) return;
             aviatorLoopRunning = true;
             setAviatorConnectionUI(true);
-            requestAnimationFrame(masterGameLoop);
+            gzScheduleAviatorFrame();
         }
         window.addEventListener('offline', stopAviatorLoopForOffline);
         window.addEventListener('online', startAviatorLoopIfOnline);
@@ -2684,17 +2718,28 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 userEmailDisplay.innerText = user.email;
 
                 if (userDbRef) userDbRef.off();
-                userDbRef = db.ref('users/' + user.uid);
+                // Listen to the balance only. The whole user record also holds bet history and records,
+                // which would be re-downloaded on every balance change.
+                userDbRef = db.ref('users/' + user.uid + '/balance');
 
                 userDbRef.on('value', function(snapshot) {
-                    const data = snapshot.val();
-                    if (data) {
-                        currentBalance = data.balance || 0;
+                    const bal = snapshot.val();
+                    if (bal !== null) {
+                        currentBalance = bal || 0;
                         updateSharedBalanceUI();
                     } else {
-                        db.ref('users/' + user.uid).update({
-                            email: user.email, balance: 0, games: 0, wins: 0,
-                            boxingKingGames: 0, boxingKingWins: 0
+                        // No balance field yet: either a brand-new user or an old record without one.
+                        db.ref('users/' + user.uid).once('value').then(function(s) {
+                            const data = s.val();
+                            if (data) {
+                                currentBalance = data.balance || 0;
+                                updateSharedBalanceUI();
+                            } else {
+                                db.ref('users/' + user.uid).update({
+                                    email: user.email, balance: 0, games: 0, wins: 0,
+                                    boxingKingGames: 0, boxingKingWins: 0
+                                });
+                            }
                         });
                     }
                 });
@@ -2829,7 +2874,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         }
 
         // All connected players read the same finalized crash records from Firebase.
-        db.ref(AVIATOR_CRASH_HISTORY_PATH).on('value', function(snapshot) {
+        db.ref(AVIATOR_CRASH_HISTORY_PATH).orderByKey().limitToLast(40).on('value', function(snapshot) {
             const records = [];
             snapshot.forEach(function(child) {
                 const record = child.val();
@@ -2929,7 +2974,12 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             } catch (e) { console.warn('Live bet publish failed (check Firebase Rules for aviatorGame/liveBets):', e); }
         }
 
+        let gzLiveSig = '', gzLiveAt = 0;
         function renderMyLiveBetUI(currentRoundIndex, isCrashed) {
+            const nowT = performance.now();
+            const sig = currentRoundIndex + '|' + (isCrashed ? 1 : 0) + '|' + (betRoundIndex === currentRoundIndex ? 1 : 0) + (hasCashedOut ? 1 : 0);
+            if (sig === gzLiveSig && nowT - gzLiveAt < 200) return;
+            gzLiveSig = sig; gzLiveAt = nowT;
             const rows = [];
             watchLiveBets(currentRoundIndex);
             const crashPoint = Number(aviatorRoundState && aviatorRoundState.crashPoint) || 1;
@@ -3093,10 +3143,11 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             if (!isAviatorOnline()) { stopAviatorLoopForOffline(); return; }
             advanceAviatorRoundState();
 
+            const vis = gzAviatorVisible();
             const roundState = aviatorRoundState;
             if (!roundState) {
                 multiplierDisplay.innerText = 'CONNECTING...';
-                if (isAviatorOnline()) requestAnimationFrame(masterGameLoop);
+                if (isAviatorOnline()) gzScheduleAviatorFrame();
                 return;
             }
 
@@ -3127,6 +3178,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 : roundState.state;
 
             if (state === 'countdown') {
+              if (vis) {
                 const countdownEnd = Number(roundState.roundStartAt);
                 const waitLeft = Math.max(0, Math.ceil((countdownEnd - now) / 1000));
                 multiplierDisplay.innerText = 'NEXT ROUND IN ' + waitLeft + 's';
@@ -3136,6 +3188,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 betBtn.innerText = isProcessingBet ? 'প্রসেসিং...' : 'পরবর্তী রাউন্ডে বেট দিন';
                 betBtn.className = 'av-btn av-btn-action av-btn-bet';
                 betBtn.disabled = isProcessingBet;
+              }
             } else if (state === 'crashed') {
                 // The shared crashAtMs is authoritative. Once local server-adjusted
                 // time reaches it, publish this exact shared result immediately rather
@@ -3152,17 +3205,21 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 }
                 currentLocalMult = targetCrashPoint;
                 lastCrashedDisplayValue = currentLocalMult;
-                multiplierDisplay.innerText = 'FLEW AWAY!\n' + targetCrashPoint.toFixed(2) + 'x';
-                multiplierDisplay.classList.add('crashed');
+                if (vis) {
+                    multiplierDisplay.innerText = 'FLEW AWAY!\n' + targetCrashPoint.toFixed(2) + 'x';
+                    multiplierDisplay.classList.add('crashed');
+                }
                 if (isBetActiveForCurrentRound && !hasCashedOut && currentUser && lastCrashSettlementAttempt !== currentRoundIndex) {
                     lastCrashSettlementAttempt = currentRoundIndex;
                     settleAviatorCrash(currentRoundIndex, targetCrashPoint);
                 }
-                renderMyLiveBetUI(currentRoundIndex, true);
-                drawAviatorFlight(targetCrashPoint, Math.max(0, (crashAtMs - roundStartMs) / 1000), Math.max(0.001, (crashAtMs - roundStartMs) / 1000));
-                betBtn.innerText = 'অপেক্ষমাণ...';
-                betBtn.className = 'av-btn av-btn-action av-btn-waiting';
-                betBtn.disabled = true;
+                if (vis) {
+                    renderMyLiveBetUI(currentRoundIndex, true);
+                    drawAviatorFlight(targetCrashPoint, Math.max(0, (crashAtMs - roundStartMs) / 1000), Math.max(0.001, (crashAtMs - roundStartMs) / 1000));
+                    betBtn.innerText = 'অপেক্ষমাণ...';
+                    betBtn.className = 'av-btn av-btn-action av-btn-waiting';
+                    betBtn.disabled = true;
+                }
             } else {
                 const flyElapsed = Math.max(0, (now - roundStartMs) / 1000);
                 const totalFlightTimeNeeded = Math.max(0.001, (crashAtMs - roundStartMs) / 1000);
@@ -3171,6 +3228,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 }
                 const calculatedMult = calculateMultiplierFromTime(Math.min(flyElapsed, totalFlightTimeNeeded));
                 currentLocalMult = Math.min(calculatedMult, targetCrashPoint);
+              if (vis) {
                 multiplierDisplay.innerText = currentLocalMult.toFixed(2) + 'x';
                 multiplierDisplay.classList.remove('crashed');
                 renderMyLiveBetUI(currentRoundIndex, false);
@@ -3196,9 +3254,10 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     betBtn.className = 'av-btn av-btn-action av-btn-waiting';
                     betBtn.disabled = true;
                 }
+              }
             }
 
-            if (isAviatorOnline()) requestAnimationFrame(masterGameLoop);
+            if (isAviatorOnline()) gzScheduleAviatorFrame();
             else stopAviatorLoopForOffline();
         }
 
@@ -4839,9 +4898,17 @@ function rbLockAndSpin(){
     const btn=document.getElementById("withdraw-btn");
     const notice=document.getElementById("withdraw-cooldown-notice");
     if(!btn || !currentUser) return;
+    if(window.__gzWdBusy) return;
+    window.__gzWdBusy=true;
     try{
-      let snap=await db.ref("users/"+currentUser.uid).once("value");
-      let u=snap.val()||{};
+      // Read only the three fields this check needs (not the whole user record, which also holds bet history).
+      const uid0=currentUser.uid;
+      const parts=await Promise.all([
+        db.ref("users/"+uid0+"/balance").once("value"),
+        db.ref("users/"+uid0+"/bonusTurnover").once("value"),
+        db.ref("users/"+uid0+"/lastDepositAt").once("value")
+      ]);
+      let u={balance:parts[0].val(),bonusTurnover:parts[1].val(),lastDepositAt:parts[2].val()};
       if(Number(u.balance||0)<1 && typeof window.gzApplyLowBalanceDepositUnlock==='function'){
         u=(await window.gzApplyLowBalanceDepositUnlock(currentUser.uid))||u;
       }
@@ -4872,6 +4939,7 @@ function rbLockAndSpin(){
       if(dCount) dCount.textContent=depositLocked?window.gzFormatRemaining(left):'';
       if(notice) notice.classList.toggle('hidden',!locked);
     }catch(e){ console.warn('Could not refresh withdrawal lock:',e); }
+    finally{ window.__gzWdBusy=false; }
   }
 
   window.gzUpdateWithdrawLockUI = updateWithdrawLockUI;
@@ -4901,13 +4969,21 @@ function rbLockAndSpin(){
   });
 
   // Keep the lock state fresh while the user remains logged in.
-  setInterval(updateWithdrawLockUI,1000);
-  setInterval(updateBonusTurnoverUI,5000);
+  // 1-second refresh only while the Withdraw window is open; otherwise every 20 seconds. Nothing runs while the tab is hidden.
+  let gzWdTick=0;
+  setInterval(function(){
+    if(document.hidden) return;
+    gzWdTick++;
+    const m=document.getElementById("withdraw-modal");
+    const open=!!(m && !m.classList.contains("hidden"));
+    if(open || gzWdTick%20===0) updateWithdrawLockUI();
+  },1000);
+  setInterval(function(){ if(!document.hidden) updateBonusTurnoverUI(); },5000);
   setTimeout(updateWithdrawLockUI,1000);
   setTimeout(updateBonusTurnoverUI,1100);
   loadTurnoverMultiplier();
   setTimeout(refreshBonusBadge,1200);
-  setInterval(refreshBonusBadge,15000);
+  setInterval(function(){ if(!document.hidden) refreshBonusBadge(); },30000);
 })();
 
 </script>
