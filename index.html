@@ -2269,7 +2269,8 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             const userRef=db.ref('users/'+uid);
             try{
                 const result=await userRef.transaction(function(user){
-                    if(!user) return;
+                    // Local cache may be empty/partial on the first pass; return it unchanged so Firebase re-runs with real server data instead of aborting.
+                    if(!user || user.bonusTurnover===undefined) return user;
                     const balance=Number(user.balance||0);
                     const t=user.bonusTurnover||{};
                     const required=Math.max(0,Number(t.required||0));
@@ -2279,7 +2280,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                         return user;
                     }
                     return; // No change needed.
-                });
+                },undefined,false);
                 return result && result.snapshot ? result.snapshot.val() : null;
             }catch(err){ console.warn('Low-balance turnover rule could not be saved:',err); return null; }
         };
@@ -2691,7 +2692,30 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         });
         updateAuthModeUI();
 
+        // Logout lock: after login the account can only be logged out 24 hours later.
+        const LOGOUT_LOCK_MS = 24 * 60 * 60 * 1000;
+        function logoutLockKey(uid) { return 'gzLogoutUnlockAt_' + uid; }
+        function ensureLogoutLock(uid) {
+            try {
+                const k = logoutLockKey(uid);
+                if (!localStorage.getItem(k)) localStorage.setItem(k, String(Date.now() + LOGOUT_LOCK_MS));
+            } catch (e) {}
+        }
+        function logoutLockRemainingMs(uid) {
+            try {
+                const at = Number(localStorage.getItem(logoutLockKey(uid)) || 0);
+                return at > Date.now() ? at - Date.now() : 0;
+            } catch (e) { return 0; }
+        }
         document.getElementById('logout-btn').addEventListener('click', function() {
+            const uid = currentUser && currentUser.uid;
+            const left = uid ? logoutLockRemainingMs(uid) : 0;
+            if (left > 0) {
+                const h = Math.floor(left / 3600000), m = Math.floor((left % 3600000) / 60000);
+                alert('এই অ্যাকাউন্ট থেকে ২৪ ঘণ্টা পর্যন্ত Logout করা যাবে না। আর ' + h + ' ঘণ্টা ' + m + ' মিনিট পরে Logout করতে পারবেন।');
+                return;
+            }
+            if (uid) { try { localStorage.removeItem(logoutLockKey(uid)); } catch (e) {} }
             auth.signOut().then(() => { window.location.reload(); });
         });
 
@@ -2729,6 +2753,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         auth.onAuthStateChanged(function(user) {
             if (user) {
                 currentUser = user;
+                ensureLogoutLock(user.uid);
                 updateLobbyUid(user.uid);
                 loadUserRtpReferenceFactor(user.uid);
                 authModal.classList.add('hidden');
