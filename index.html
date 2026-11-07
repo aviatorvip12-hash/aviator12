@@ -3288,7 +3288,8 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 const betCrashAtMs = Number.isFinite(crashAtMs) ? crashAtMs : (roundStartMs + predictedFlightMs);
                 const totalFlightTimeNeeded = predictedFlightMs / 1000;
                 db.ref('users/' + currentUser.uid).transaction(function(data) {
-                    if (!data) return;
+                    // Local cache can be empty/partial on the first pass; return it unchanged so Firebase re-runs this with real server data instead of aborting.
+                    if (!data || data.balance === undefined) return data;
                     const balance = Number(data.balance) || 0;
                     const bets = data.aviatorBets || {};
                     const existing = bets[roundKey];
@@ -3307,7 +3308,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     };
                     data.aviatorBets = bets;
                     return data;
-                }).then(function(result) {
+                }, undefined, false).then(function(result) {
                     isProcessingBet = false;
                     if (result.committed) {
                         if (typeof window.gzRecordBonusTurnover === 'function') window.gzRecordBonusTurnover(betAmt, 'Aviator');
@@ -3336,7 +3337,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 const uid = currentUser.uid;
                 const userRef = db.ref('users/' + uid);
                 userRef.transaction(function(data) {
-                    if (!data) return;
+                    if (!data || data.aviatorBets === undefined) return data;
                     const bets = data.aviatorBets || {};
                     const bet = bets[roundKey];
                     if (!bet || bet.status !== 'active') return;
@@ -3365,7 +3366,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     data.games = (Number(data.games) || 0) + 1;
                     data.aviatorBets = bets;
                     return data;
-                }).then(function(result) {
+                }, undefined, false).then(function(result) {
                     isProcessingBet = false;
                     const data = result.snapshot.val() || {};
                     const bet = (data.aviatorBets || {})[roundKey];
