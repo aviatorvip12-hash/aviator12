@@ -2045,10 +2045,11 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             }
             if (lobbyAnnounceBar) lobbyAnnounceBar.classList.toggle('hidden', !hasMessage || !lobbyIsActive);
             if (announceBar) {
-                announceBar.textContent = hasMessage ? '📢 ' + message : '';
-                announceBar.classList.toggle('hidden', !hasMessage || lobbyIsActive);
+                // Announcement is shown only in the lobby ticker; never inside games/other screens.
+                announceBar.textContent = '';
+                announceBar.classList.add('hidden');
             }
-            document.body.classList.toggle('announce-visible', hasMessage && !lobbyIsActive);
+            document.body.classList.remove('announce-visible');
         }
         db.ref('adminSettings/announcement').on('value', function(snapshot) {
             currentAnnouncementText = String(snapshot.val() || '').trim();
