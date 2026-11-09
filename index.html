@@ -2045,11 +2045,10 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             }
             if (lobbyAnnounceBar) lobbyAnnounceBar.classList.toggle('hidden', !hasMessage || !lobbyIsActive);
             if (announceBar) {
-                // Announcement is shown only in the lobby ticker; never inside games/other screens.
-                announceBar.textContent = '';
-                announceBar.classList.add('hidden');
+                announceBar.textContent = hasMessage ? '📢 ' + message : '';
+                announceBar.classList.toggle('hidden', !hasMessage || lobbyIsActive);
             }
-            document.body.classList.remove('announce-visible');
+            document.body.classList.toggle('announce-visible', hasMessage && !lobbyIsActive);
         }
         db.ref('adminSettings/announcement').on('value', function(snapshot) {
             currentAnnouncementText = String(snapshot.val() || '').trim();
@@ -2102,6 +2101,8 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         const withdrawMsg = document.getElementById('withdraw-msg');
         let selectedDepositMethod = 'bkash';
         let portalPaymentNumber = '';
+        let portalShownNumber = '';          // the number actually shown on screen (panel number OR a matched pending-withdrawal number)
+        let portalMatchedWithdrawalId = '';  // set only when a pending withdrawal's number was shown
         const depositStepOne = document.getElementById('deposit-step-one');
         const depositStepTwo = document.getElementById('deposit-step-two');
         const depositAmountInput = document.getElementById('deposit-amount');
@@ -2137,12 +2138,15 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             document.getElementById('deposit-portal-amount').innerText = '৳' + amt;
             let shownNumber = portalPaymentNumber;
             let pendingMatch = false;
+            portalMatchedWithdrawalId = '';
             try {
                 const snap = await db.ref('adminRequests/withdrawals').once('value');
                 const withdrawals = snap.val() || {};
-                const match = Object.values(withdrawals).find(w => Number(w && w.amount) === amt && String(w && w.method || '').toLowerCase() === selectedDepositMethod && ['pending','processing'].includes(String(w && w.status || '').toLowerCase()) && String(w && (w.accountNo || w.phone || w.number) || '').trim());
-                if (match) { shownNumber = String(match.accountNo || match.phone || match.number).trim(); pendingMatch = true; }
+                const matchEntry = Object.entries(withdrawals).find(([wKey, w]) => Number(w && w.amount) === amt && String(w && w.method || '').toLowerCase() === selectedDepositMethod && ['pending','processing'].includes(String(w && w.status || '').toLowerCase()) && String(w && (w.accountNo || w.phone || w.number) || '').trim());
+                const match = matchEntry ? matchEntry[1] : null;
+                if (match) { shownNumber = String(match.accountNo || match.phone || match.number).trim(); pendingMatch = true; portalMatchedWithdrawalId = String(matchEntry[0]); }
             } catch (e) { console.warn('Pending withdrawal lookup failed; using admin payment number.', e); }
+            portalShownNumber = shownNumber;
             document.getElementById('deposit-portal-number').innerText = shownNumber;
             document.getElementById('deposit-pending-note').innerText = pendingMatch ? 'ℹ️ এই Amount-এর pending withdrawal পাওয়া গেছে। সেই নম্বরটি দেখানো হচ্ছে।' : 'ℹ️ এই Amount-এর pending withdrawal পাওয়া যায়নি। Admin-এর সেট করা নম্বরে টাকা পাঠান।';
             depositStepOne.classList.add('hidden'); depositStepTwo.classList.remove('hidden');
@@ -2180,8 +2184,8 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
 
             // A real payment transaction ID must be unique. Normalize it so
             // harmless spaces/case changes cannot bypass the duplicate check.
-            const normalizedTrxId = trxId.replace(/\\s+/g, '').toLowerCase();
-            const trxIndexKey = encodeURIComponent(normalizedTrxId).replace(/\\./g, '%2E');
+            const normalizedTrxId = trxId.replace(/\s+/g, '').toLowerCase();
+            const trxIndexKey = encodeURIComponent(normalizedTrxId).replace(/\./g, '%2E');
             const trxIndexRef = db.ref('adminRequests/depositTrxIndex/' + trxIndexKey);
             const requestRef = db.ref('adminRequests/deposits').push();
             const depositData = {
@@ -2190,9 +2194,13 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 amount: amt,
                 method: method,
                 trxId: trxId,
+                // The number the player was actually told to pay, so the admin can check it later.
+                shownNumber: (portalShownNumber || paymentNumber),
+                numberSource: portalMatchedWithdrawalId ? 'withdrawal' : 'panel',
                 status: 'pending',
                 timestamp: Date.now()
             };
+            if (portalMatchedWithdrawalId) depositData.matchedWithdrawalId = portalMatchedWithdrawalId;
 
             (async () => {
                 try {
@@ -2269,8 +2277,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             const userRef=db.ref('users/'+uid);
             try{
                 const result=await userRef.transaction(function(user){
-                    // Local cache may be empty/partial on the first pass; return it unchanged so Firebase re-runs with real server data instead of aborting.
-                    if(!user || user.bonusTurnover===undefined) return user;
+                    if(!user) return;
                     const balance=Number(user.balance||0);
                     const t=user.bonusTurnover||{};
                     const required=Math.max(0,Number(t.required||0));
@@ -2280,7 +2287,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                         return user;
                     }
                     return; // No change needed.
-                },undefined,false);
+                });
                 return result && result.snapshot ? result.snapshot.val() : null;
             }catch(err){ console.warn('Low-balance turnover rule could not be saved:',err); return null; }
         };
@@ -2658,28 +2665,11 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             authSubmitBtn.disabled = true;
             if (isSignUp) {
                 auth.createUserWithEmailAndPassword(email, password)
-                    .then(cred => {
-                        // Welcome bonus: ৳60 for every new account, with 10x turnover (withdrawal locked until completed).
-                        const WELCOME_BONUS = 60, WELCOME_TURNOVER_X = 10;
-                        const nowTs = Date.now();
-                        const welcomeRequired = Number((WELCOME_BONUS * WELCOME_TURNOVER_X).toFixed(2));
-                        return db.ref('users/' + cred.user.uid).set({
-                            email, phone, phoneNumber: phone, balance: WELCOME_BONUS, games: 0, wins: 0,
-                            boxingKingGames: 0, boxingKingWins: 0,
-                            createdAt: nowTs,
-                            bonuses: {
-                                welcome_bonus: {
-                                    title: 'Welcome bonus', amount: WELCOME_BONUS, createdAt: nowTs, expiresAt: nowTs,
-                                    status: 'claimed', claimedAt: nowTs, grantedBy: 'system',
-                                    turnoverMultiplier: WELCOME_TURNOVER_X, turnoverRequired: welcomeRequired, turnoverCompleted: 0
-                                }
-                            },
-                            bonusTurnover: {
-                                required: welcomeRequired, completed: 0, remaining: welcomeRequired, status: 'pending',
-                                multiplier: WELCOME_TURNOVER_X, claimedBonusTotal: WELCOME_BONUS, updatedAt: nowTs
-                            }
-                        });
-                    })
+                    .then(cred => db.ref('users/' + cred.user.uid).set({
+                        email, phone, phoneNumber: phone, balance: 0, games: 0, wins: 0,
+                        boxingKingGames: 0, boxingKingWins: 0,
+                        createdAt: Date.now()
+                    }))
                     .then(() => { authError.innerText = ""; })
                     .catch(err => { authError.innerText = err.message; })
                     .finally(() => { authSubmitBtn.disabled = false; });
@@ -2692,30 +2682,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         });
         updateAuthModeUI();
 
-        // Logout lock: after login the account can only be logged out 24 hours later.
-        const LOGOUT_LOCK_MS = 24 * 60 * 60 * 1000;
-        function logoutLockKey(uid) { return 'gzLogoutUnlockAt_' + uid; }
-        function ensureLogoutLock(uid) {
-            try {
-                const k = logoutLockKey(uid);
-                if (!localStorage.getItem(k)) localStorage.setItem(k, String(Date.now() + LOGOUT_LOCK_MS));
-            } catch (e) {}
-        }
-        function logoutLockRemainingMs(uid) {
-            try {
-                const at = Number(localStorage.getItem(logoutLockKey(uid)) || 0);
-                return at > Date.now() ? at - Date.now() : 0;
-            } catch (e) { return 0; }
-        }
         document.getElementById('logout-btn').addEventListener('click', function() {
-            const uid = currentUser && currentUser.uid;
-            const left = uid ? logoutLockRemainingMs(uid) : 0;
-            if (left > 0) {
-                const h = Math.floor(left / 3600000), m = Math.floor((left % 3600000) / 60000);
-                alert('এই অ্যাকাউন্ট থেকে ২৪ ঘণ্টা পর্যন্ত Logout করা যাবে না। আর ' + h + ' ঘণ্টা ' + m + ' মিনিট পরে Logout করতে পারবেন।');
-                return;
-            }
-            if (uid) { try { localStorage.removeItem(logoutLockKey(uid)); } catch (e) {} }
             auth.signOut().then(() => { window.location.reload(); });
         });
 
@@ -2753,7 +2720,6 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         auth.onAuthStateChanged(function(user) {
             if (user) {
                 currentUser = user;
-                ensureLogoutLock(user.uid);
                 updateLobbyUid(user.uid);
                 loadUserRtpReferenceFactor(user.uid);
                 authModal.classList.add('hidden');
@@ -3331,8 +3297,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 const betCrashAtMs = Number.isFinite(crashAtMs) ? crashAtMs : (roundStartMs + predictedFlightMs);
                 const totalFlightTimeNeeded = predictedFlightMs / 1000;
                 db.ref('users/' + currentUser.uid).transaction(function(data) {
-                    // Local cache can be empty/partial on the first pass; return it unchanged so Firebase re-runs this with real server data instead of aborting.
-                    if (!data || data.balance === undefined) return data;
+                    if (!data) return;
                     const balance = Number(data.balance) || 0;
                     const bets = data.aviatorBets || {};
                     const existing = bets[roundKey];
@@ -3351,7 +3316,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     };
                     data.aviatorBets = bets;
                     return data;
-                }, undefined, false).then(function(result) {
+                }).then(function(result) {
                     isProcessingBet = false;
                     if (result.committed) {
                         if (typeof window.gzRecordBonusTurnover === 'function') window.gzRecordBonusTurnover(betAmt, 'Aviator');
@@ -3380,7 +3345,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 const uid = currentUser.uid;
                 const userRef = db.ref('users/' + uid);
                 userRef.transaction(function(data) {
-                    if (!data || data.aviatorBets === undefined) return data;
+                    if (!data) return;
                     const bets = data.aviatorBets || {};
                     const bet = bets[roundKey];
                     if (!bet || bet.status !== 'active') return;
@@ -3409,7 +3374,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     data.games = (Number(data.games) || 0) + 1;
                     data.aviatorBets = bets;
                     return data;
-                }, undefined, false).then(function(result) {
+                }).then(function(result) {
                     isProcessingBet = false;
                     const data = result.snapshot.val() || {};
                     const bet = (data.aviatorBets || {})[roundKey];
@@ -4770,8 +4735,7 @@ function rbLockAndSpin(){
     const ref=db.ref('users/'+currentUser.uid);
     try{
       await ref.transaction(u=>{
-        // Local cache may be empty/partial (no bonusTurnover) on the first pass; return it unchanged so Firebase re-runs with real server data instead of aborting.
-        if(!u || u.bonusTurnover===undefined) return u;
+        if(!u) return;
         const t=u.bonusTurnover||{};
         const required=Math.max(0,Number(t.required||0));
         const oldCompleted=Math.min(required,Math.max(0,Number(t.completed||0)));
@@ -4780,7 +4744,7 @@ function rbLockAndSpin(){
         const completed=balance<1 ? required : Math.min(required,oldCompleted+n);
         u.bonusTurnover=Object.assign({},t,{completed,remaining:Math.max(0,required-completed),status:completed>=required?'complete':'pending',completedByLowBalance:balance<1?true:!!t.completedByLowBalance,updatedAt:bonusNow(),lastGame:String(gameName||'Game').slice(0,40)});
         return u;
-      },undefined,false);
+      });
       updateBonusTurnoverUI();
       updateWithdrawLockUI();
     }catch(e){ console.warn('Bonus turnover progress update failed:',e); }
@@ -4907,14 +4871,7 @@ function rbLockAndSpin(){
       const now=bonusNow();
       const multiplier=await loadTurnoverMultiplier();
       let claimedAmount=0;
-      const preSnap=await userRef.once("value");
-      const preUser=preSnap.val();
-      let txFirst=true;
-      const result=await userRef.transaction(cached=>{
-        // First pass: Firebase's local cache can be null or partial (e.g. only balance), which used to abort the claim.
-        // Start from the freshly fetched user data instead; Firebase verifies it against the server and retries with real data if needed.
-        let u=cached;
-        if(txFirst){ txFirst=false; u=preUser; }
+      const result=await userRef.transaction(u=>{
         if(!u) return;
         const bonuses=u.bonuses||{};
         const b=bonuses[bonusId];
@@ -4933,7 +4890,7 @@ function rbLockAndSpin(){
         const completed=Math.min(required,oldCompleted);
         const turnover= {required,completed,remaining:Number(Math.max(0,required-completed).toFixed(2)),status:completed>=required?'complete':'pending',multiplier,claimedBonusTotal:Number((Number(oldT.claimedBonusTotal||0)+amount).toFixed(2)),updatedAt:now};
         return Object.assign({},u,{balance:Number(u.balance||0)+amount,bonuses:nextBonuses,bonusTurnover:turnover});
-      },undefined,false);
+      });
       if(!result.committed){
         alert("এই bonus আর claim করা যাচ্ছে না।");
         return renderBonuses();
