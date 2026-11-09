@@ -2727,28 +2727,20 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 userEmailDisplay.innerText = user.email;
 
                 if (userDbRef) userDbRef.off();
-                // Listen to the balance only. The whole user record also holds bet history and records,
-                // which would be re-downloaded on every balance change.
-                userDbRef = db.ref('users/' + user.uid + '/balance');
+                // IMPORTANT: listen to the WHOLE user record (not just /balance). Bets, bonus claims and
+                // other transactions run on users/{uid} and need it cached locally; without this listener
+                // they receive null on the first pass and abort ("bet could not be placed").
+                userDbRef = db.ref('users/' + user.uid);
 
                 userDbRef.on('value', function(snapshot) {
-                    const bal = snapshot.val();
-                    if (bal !== null) {
-                        currentBalance = bal || 0;
+                    const data = snapshot.val();
+                    if (data) {
+                        currentBalance = data.balance || 0;
                         updateSharedBalanceUI();
                     } else {
-                        // No balance field yet: either a brand-new user or an old record without one.
-                        db.ref('users/' + user.uid).once('value').then(function(s) {
-                            const data = s.val();
-                            if (data) {
-                                currentBalance = data.balance || 0;
-                                updateSharedBalanceUI();
-                            } else {
-                                db.ref('users/' + user.uid).update({
-                                    email: user.email, balance: 0, games: 0, wins: 0,
-                                    boxingKingGames: 0, boxingKingWins: 0
-                                });
-                            }
+                        db.ref('users/' + user.uid).update({
+                            email: user.email, balance: 0, games: 0, wins: 0,
+                            boxingKingGames: 0, boxingKingWins: 0
                         });
                     }
                 });
