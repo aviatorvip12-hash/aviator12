@@ -2044,11 +2044,12 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 lobbyAnnounceText.style.animation = '';
             }
             if (lobbyAnnounceBar) lobbyAnnounceBar.classList.toggle('hidden', !hasMessage || !lobbyIsActive);
+            // The announcement is shown only in the lobby ticker above, never inside a game screen.
             if (announceBar) {
-                announceBar.textContent = hasMessage ? '📢 ' + message : '';
-                announceBar.classList.toggle('hidden', !hasMessage || lobbyIsActive);
+                announceBar.textContent = '';
+                announceBar.classList.add('hidden');
             }
-            document.body.classList.toggle('announce-visible', hasMessage && !lobbyIsActive);
+            document.body.classList.remove('announce-visible');
         }
         db.ref('adminSettings/announcement').on('value', function(snapshot) {
             currentAnnouncementText = String(snapshot.val() || '').trim();
@@ -2641,6 +2642,10 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             updateAuthModeUI();
         });
 
+        // New-member welcome bonus. It goes into the normal Bonus Box (claim -> main balance, bonus turnover applies).
+        const REGISTER_BONUS_AMOUNT = 60;   // set 0 to switch the registration bonus off
+        const REGISTER_BONUS_HOURS = 24;    // how long the new member has to claim it
+
         authSubmitBtn.addEventListener('click', function() {
             authError.innerText = "Processing...";
             const email = document.getElementById('auth-email').value.trim();
@@ -2665,11 +2670,24 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             authSubmitBtn.disabled = true;
             if (isSignUp) {
                 auth.createUserWithEmailAndPassword(email, password)
-                    .then(cred => db.ref('users/' + cred.user.uid).set({
-                        email, phone, phoneNumber: phone, balance: 0, games: 0, wins: 0,
-                        boxingKingGames: 0, boxingKingWins: 0,
-                        createdAt: Date.now()
-                    }))
+                    .then(cred => {
+                        const now = Date.now();
+                        const userData = {
+                            email, phone, phoneNumber: phone, balance: 0, games: 0, wins: 0,
+                            boxingKingGames: 0, boxingKingWins: 0,
+                            createdAt: now
+                        };
+                        if (REGISTER_BONUS_AMOUNT > 0) {
+                            const bonusId = db.ref('users/' + cred.user.uid + '/bonuses').push().key;
+                            userData.bonuses = {};
+                            userData.bonuses[bonusId] = {
+                                title: 'Registration bonus', amount: REGISTER_BONUS_AMOUNT,
+                                createdAt: now, expiresAt: now + REGISTER_BONUS_HOURS * 60 * 60 * 1000,
+                                status: 'pending', grantedBy: 'system'
+                            };
+                        }
+                        return db.ref('users/' + cred.user.uid).set(userData);
+                    })
                     .then(() => { authError.innerText = ""; })
                     .catch(err => { authError.innerText = err.message; })
                     .finally(() => { authSubmitBtn.disabled = false; });
@@ -2682,7 +2700,53 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         });
         updateAuthModeUI();
 
+        // ===== 24-hour logout lock =====
+        // After a login or a new registration the player cannot log out for 24 hours.
+        // Start time = Firebase's own "last sign-in" time (set by the server, survives closing the app).
+        const LOGOUT_LOCK_HOURS = 24;   // set 0 to switch the lock off
+        function gzServerNow() { return Date.now() + ((typeof aviatorServerTimeOffset === 'number') ? aviatorServerTimeOffset : 0); }
+        function gzLogoutLockLeftMs() {
+            if (!LOGOUT_LOCK_HOURS || !currentUser) return 0;
+            let start = 0;
+            try {
+                const t = currentUser.metadata && (currentUser.metadata.lastSignInTime || currentUser.metadata.creationTime);
+                if (t) start = Date.parse(t) || 0;
+            } catch (e) {}
+            if (!start) {
+                // Fallback: remember when this device first saw the session.
+                try {
+                    const k = 'gz_login_at_' + currentUser.uid;
+                    start = Number(localStorage.getItem(k)) || 0;
+                    if (!start) { start = gzServerNow(); localStorage.setItem(k, String(start)); }
+                } catch (e) { return 0; }
+            }
+            return Math.max(0, start + LOGOUT_LOCK_HOURS * 60 * 60 * 1000 - gzServerNow());
+        }
+        function gzBnDigits(s) { return String(s).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]); }
+        function gzLockText(ms) {
+            const m = Math.ceil(ms / 60000), h = Math.floor(m / 60);
+            return gzBnDigits((h ? h + ' ঘণ্টা ' : '') + (m % 60) + ' মিনিট');
+        }
+        function gzUpdateLogoutLockUI() {
+            const left = gzLogoutLockLeftMs();
+            const mb = document.getElementById('gz-member-logout');
+            if (mb) {
+                mb.textContent = left > 0 ? '🔒 লগ আউট (' + gzLockText(left) + ' পরে)' : '↪ লগ আউট';
+                mb.style.opacity = left > 0 ? '.7' : '';
+            }
+            const eb = document.getElementById('logout-btn');
+            if (eb) eb.textContent = left > 0 ? 'Exit 🔒' : 'Exit';
+        }
+        setInterval(function() { if (!document.hidden) gzUpdateLogoutLockUI(); }, 20000);
+        setTimeout(gzUpdateLogoutLockUI, 1500);
+
         document.getElementById('logout-btn').addEventListener('click', function() {
+            const left = gzLogoutLockLeftMs();
+            if (left > 0) {
+                gzUpdateLogoutLockUI();
+                alert('নিরাপত্তার জন্য লগইন বা রেজিস্ট্রেশনের পর ' + gzBnDigits(LOGOUT_LOCK_HOURS) + ' ঘণ্টা লগ আউট করা যায় না।\nলগ আউট করা যাবে: ' + gzLockText(left) + ' পরে।');
+                return;
+            }
             auth.signOut().then(() => { window.location.reload(); });
         });
 
@@ -4815,7 +4879,7 @@ function rbLockAndSpin(){
     );
 
     status.textContent = active.length
-      ? `আপনার ${active.length}টি claim করা যায় এমন bonus আছে। প্রতিটি bonus ৫ ঘণ্টার মধ্যে claim করতে হবে।`
+      ? `আপনার ${active.length}টি claim করা যায় এমন bonus আছে। প্রতিটি bonus-এর claim করার সময় নিচে দেখানো আছে।`
       : "এখন কোনো active bonus নেই।";
 
     list.innerHTML="";
