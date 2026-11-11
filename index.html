@@ -1670,6 +1670,32 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
     <style>
       .cg-cell.scatter{box-shadow:0 0 14px 3px #ffd54a,inset 0 0 10px #ffd54a99;animation:cgScat .7s infinite alternate}
       @keyframes cgScat{from{transform:scale(1)}to{transform:scale(1.07)}}
+
+      /* ===== Color Gems win popups (light rays, glowing star, confetti cannons) ===== */
+      .cgp{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 38%,rgba(40,25,120,.55),rgba(4,3,22,.9) 70%);animation:cgpIn .25s ease-out;overflow:hidden;touch-action:manipulation}
+      .cgp.out{animation:cgpOut .22s ease-in forwards}
+      @keyframes cgpIn{from{opacity:0}to{opacity:1}}@keyframes cgpOut{to{opacity:0}}
+      .cgp-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+      .cgp-rays{position:absolute;left:50%;top:40%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(from 0deg,rgba(255,235,130,.34) 0 7deg,rgba(255,235,130,0) 7deg 18deg);-webkit-mask-image:radial-gradient(circle,#000 0,transparent 50%);mask-image:radial-gradient(circle,#000 0,transparent 50%);animation:cgpSpin 16s linear infinite;pointer-events:none}
+      @keyframes cgpSpin{to{transform:rotate(360deg)}}
+      .cgp-card{position:relative;z-index:2;width:min(92vw,380px);text-align:center;animation:cgpPop .55s cubic-bezier(.2,1.5,.4,1)}
+      @keyframes cgpPop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+      .cgp-title{font-size:44px;font-weight:900;line-height:1.05;color:#ffd84a;background:linear-gradient(#fff6b0,#ffc21a 55%,#ff9a00);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:2px #b34a00;paint-order:stroke fill;filter:drop-shadow(0 4px 0 #8a3200) drop-shadow(0 0 14px rgba(255,190,40,.7));letter-spacing:.5px}
+      .cgp-starwrap{position:relative;margin:6px auto 0;width:210px;height:200px;display:grid;place-items:center}
+      .cgp-glow{position:absolute;inset:-20px;background:radial-gradient(circle,rgba(255,236,120,.95) 0,rgba(255,200,40,.45) 38%,transparent 68%);animation:cgpPulse 1.6s ease-in-out infinite}
+      @keyframes cgpPulse{0%,100%{transform:scale(.92);opacity:.85}50%{transform:scale(1.08);opacity:1}}
+      .cgp-star{position:relative;width:190px;height:190px;filter:drop-shadow(0 8px 10px rgba(120,50,0,.55));animation:cgpFloat 2.4s ease-in-out infinite}
+      @keyframes cgpFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+      .cgp-big{margin-top:2px;font-size:58px;font-weight:900;color:#fff;-webkit-text-stroke:3px #7a3b00;paint-order:stroke fill;text-shadow:0 5px 0 #7a3b00,0 0 18px rgba(255,200,60,.6);line-height:1}
+      .cgp-sub{margin-top:6px;font-size:18px;font-weight:800;color:#fff3c4;text-shadow:0 2px 6px #000a}
+      .cgp-btn{margin-top:20px;min-width:190px;padding:13px 28px;border-radius:16px;border:2px solid #b8ff8a;background:linear-gradient(#5be04a,#1f9d2f);color:#fff;font-size:22px;font-weight:900;text-shadow:0 2px 0 #14661c;box-shadow:0 6px 0 #14661c,0 10px 24px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,255,255,.4);cursor:pointer}
+      .cgp-btn:active{transform:translateY(3px);box-shadow:0 3px 0 #14661c,0 6px 14px rgba(0,0,0,.45)}
+      .cgp-cone{position:absolute;bottom:-6px;width:130px;height:130px;z-index:4;pointer-events:none}
+      .cgp-cone.l{left:-14px;transform:rotate(38deg);animation:cgpKick .6s ease-out}.cgp-cone.r{right:-14px;transform:rotate(-38deg) scaleX(-1);animation:cgpKick .6s ease-out}
+      @keyframes cgpKick{0%{opacity:0;translate:0 40px}30%{opacity:1}100%{translate:0 0}}
+      html.gz-lite .cgp-rays{animation:none;opacity:.7}
+      html.gz-lite .cgp-glow{animation:none}
+      html.gz-lite .cgp-star{animation:none}
       .cg-free{display:none;margin-top:7px;padding:7px 10px;border-radius:10px;border:2px solid #ffd54a;background:linear-gradient(90deg,#5b2bd6,#c9378f);color:#fff;font-weight:800;font-size:.85rem;text-align:center;box-shadow:0 0 12px #ffd54a88}
       .cg-free b{color:#ffe27a}
     </style>
@@ -4289,13 +4315,76 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             const l=document.getElementById('cg-free-left'),w=document.getElementById('cg-free-win');
             if(l)l.textContent=cgFree.left;if(w)w.textContent=cgFmt(cgFree.sessionWin);
         }
+                /* ===== Win popups: Free Spin start / extra spins / total win ===== */
+        let cgPopEl=null,cgPopTimer=null,cgPopRaf=null,cgPopClose=null,cgPopFxRaf=null;
+        const CG_STAR_SVG='<svg class="cgp-star" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="cgpg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7b8"/><stop offset=".5" stop-color="#ffc928"/><stop offset="1" stop-color="#ff9a00"/></linearGradient></defs><polygon points="50,5 62,37 96,38 69,59 79,93 50,73 21,93 31,59 4,38 38,37" fill="url(#cgpg)" stroke="#e07800" stroke-width="5" stroke-linejoin="round"/><polygon points="50,14 59,40 84,41 64,56 71,80 50,66" fill="rgba(255,255,255,.28)"/></svg>';
+        const CG_CONE_SVG='<svg class="cgp-cone CLS" viewBox="0 0 100 100" aria-hidden="true"><polygon points="8,34 8,66 74,92 74,8" fill="#ff7bb5"/><polygon points="22,30 30,28 30,72 22,70" fill="#fff3a0"/><polygon points="40,24 48,22 48,78 40,76" fill="#7be0ff"/><polygon points="58,17 66,15 66,85 58,83" fill="#fff3a0"/><ellipse cx="76" cy="50" rx="9" ry="43" fill="#ffd0e6"/></svg>';
+        function cgStopPopupFx(){if(cgPopFxRaf){cancelAnimationFrame(cgPopFxRaf);cgPopFxRaf=null}if(cgPopRaf){cancelAnimationFrame(cgPopRaf);cgPopRaf=null}}
+        function cgClosePopup(){
+            if(!cgPopEl)return;
+            clearTimeout(cgPopTimer);cgStopPopupFx();
+            const el=cgPopEl,cb=cgPopClose;cgPopEl=null;cgPopClose=null;
+            el.classList.add('out');setTimeout(function(){el.remove()},230);
+            if(cb)cb();
+        }
+        function cgConfetti(canvas){
+            const lite=document.documentElement.classList.contains('gz-lite');
+            const dpr=Math.min(window.devicePixelRatio||1,lite?1:2);
+            const W=canvas.width=Math.floor(window.innerWidth*dpr),H=canvas.height=Math.floor(window.innerHeight*dpr);
+            const ctx=canvas.getContext('2d');if(!ctx)return;
+            const colors=['#ff4d6d','#ffd23f','#3ddc84','#4db8ff','#b77bff','#ff9a3d','#ffffff'];
+            const parts=[],per=lite?45:110;
+            for(let side=0;side<2;side++){
+                for(let i=0;i<per;i++){
+                    const a=(0.14+Math.random()*0.26)*Math.PI;                 // 25°–72° away from straight up
+                    const sp=(0.9+Math.random()*1.1)*H*0.0125;
+                    parts.push({x:side?W:0,y:H,vx:(side?-1:1)*Math.sin(a)*sp,vy:-Math.cos(a)*sp,w:(5+Math.random()*7)*dpr,h:(3+Math.random()*5)*dpr,r:Math.random()*6.28,vr:(Math.random()-.5)*.4,c:colors[(Math.random()*colors.length)|0],life:0});
+                }
+            }
+            let last=performance.now();const t0=last;
+            (function frame(now){
+                const dt=Math.min(32,now-last)/16.7;last=now;
+                ctx.clearRect(0,0,W,H);
+                let alive=0;
+                for(const q of parts){
+                    q.vy+=0.16*dt*dpr*0.6;q.vx*=0.995;q.x+=q.vx*dt;q.y+=q.vy*dt;q.r+=q.vr*dt;q.life+=dt;
+                    if(q.y<H+30&&q.life<260){alive++;ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.r);ctx.globalAlpha=Math.max(0,1-q.life/260);ctx.fillStyle=q.c;ctx.fillRect(-q.w/2,-q.h/2,q.w,q.h);ctx.restore()}
+                }
+                if(alive&&now-t0<6000)cgPopFxRaf=requestAnimationFrame(frame);else{ctx.clearRect(0,0,W,H);cgPopFxRaf=null}
+            })(last);
+        }
+        function cgShowPopup(opt,onClose){
+            if(cgPopEl){cgPopClose=null;cgClosePopup()}
+            const kind=opt.kind;
+            let title='FREE SPIN!',big='',sub='',btn='Start',auto=4500;
+            if(kind==='start'){title='FREE SPIN!';big=String(opt.spins);sub='টি Free Spin পেয়েছেন • জয় '+cgScatterCfg.winMult+'x';btn='Start';auto=4500}
+            else if(kind==='more'){title='BONUS SPINS!';big='+'+opt.add;sub='অতিরিক্ত Free Spin যোগ হয়েছে';btn='Continue';auto=2800}
+            else{title='TOTAL WIN';big='0.00';sub='কয়েন • Free Spin শেষ';btn='Continue';auto=5500}
+            const el=document.createElement('div');el.className='cgp';
+            el.innerHTML='<div class="cgp-rays"></div><canvas class="cgp-fx"></canvas>'+CG_CONE_SVG.replace('CLS','l')+CG_CONE_SVG.replace('CLS','r')
+              +'<div class="cgp-card"><div class="cgp-title">'+title+'</div><div class="cgp-starwrap"><div class="cgp-glow"></div>'+CG_STAR_SVG+'</div>'
+              +'<div class="cgp-big" id="cgp-big">'+big+'</div><div class="cgp-sub">'+sub+'</div><button type="button" class="cgp-btn" id="cgp-btn">'+btn+'</button></div>';
+            document.body.appendChild(el);
+            cgPopEl=el;cgPopClose=onClose||null;
+            el.querySelector('#cgp-btn').addEventListener('click',cgClosePopup);
+            cgConfetti(el.querySelector('.cgp-fx'));
+            if(kind==='total'){
+                const target=Number(opt.total)||0,t0=performance.now(),dur=1400,bigEl=el.querySelector('#cgp-big');
+                (function tick(now){const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3);bigEl.textContent=cgFmt(target*e);if(k<1)cgPopRaf=requestAnimationFrame(tick);else cgPopRaf=null})(t0);
+            }
+            cgPopTimer=setTimeout(cgClosePopup,auto);
+        }
         function cgEndFree(){
             const total=cgFree.sessionWin;
             cgFree.active=false;cgFree.left=0;
             cgWin=total;updateCgUI();cgUpdateFreeBadge();
             cgSetStatus('⭐ Free Spin শেষ! মোট জয়: '+cgFmt(total)+' কয়েন','#ffcc00');
-            cgSpinning=false;setCgControls(!cgConfig.enabled);
-            if(cgAuto)cgAutoTimer=setTimeout(handleCgSpin,1800);
+            const release=function(){
+                cgSpinning=false;setCgControls(!cgConfig.enabled);
+                if(cgAuto)cgAutoTimer=setTimeout(handleCgSpin,1800);
+            };
+            if(total>0)cgShowPopup({kind:'total',total:total},release);   /* controls stay locked until the popup closes */
+            else release();
         }
         function cgRunFreeSpin(){
             if(!cgFree.active)return;
@@ -4498,17 +4587,22 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
 
             if(cgScatterHit){
                 cgScatterHit=false;
+                let pop=null;
                 if(isFree){
                     const total=cgFree.done+cgFree.left;
                     const add=Math.max(0,Math.min(cgScatterCfg.retrigger,cgScatterCfg.maxSpins-total));
                     cgFree.left+=add;
                     cgSetStatus(add>0?'⭐⭐⭐ নতুন Scatter! +'+add+' Free Spin':'⭐⭐⭐ Scatter! (Free Spin সর্বোচ্চ সীমায় পৌঁছেছে)','#ffe27a');
+                    if(add>0)pop={kind:'more',add:add};
                 }else{
                     cgFree={active:true,left:cgScatterCfg.freeSpins,done:0,bet:activeBet,sessionWin:0};
                     cgSetStatus('⭐⭐⭐ ৩টি Scatter! '+cgScatterCfg.freeSpins+'টি Free Spin শুরু হচ্ছে • জয় '+cgScatterCfg.winMult+'x','#ffe27a');
+                    pop={kind:'start',spins:cgScatterCfg.freeSpins};
                 }
                 cgUpdateFreeBadge();
-                setTimeout(cgRunFreeSpin,2000);   /* controls stay locked during the session */
+                /* controls stay locked during the whole session; the popup hands over to the next free spin when it closes */
+                if(pop)setTimeout(function(){cgShowPopup(pop,cgRunFreeSpin)},700);   /* short pause so the 3 glowing scatters are seen first */
+                else setTimeout(cgRunFreeSpin,1300);
                 return;
             }
             if(isFree){
