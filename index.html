@@ -3873,6 +3873,20 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
 
 
 /* COLOR GEMS — same lobby/auth/shared-wallet/admin-control pattern as Boxing King */
+        /* Flag King random numbers: browser cryptographic generator (crypto.getRandomValues) instead of Math.random().
+           53 random bits per draw, no modulo bias. Falls back to Math.random() only on very old browsers.
+           Symbol probabilities, payouts and the RTP factor are NOT changed. */
+        function gzSecureRandom() {
+            try {
+                if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+                    const a = new Uint32Array(2);
+                    crypto.getRandomValues(a);
+                    return (a[0] * 2097152 + (a[1] >>> 11)) / 9007199254740992;
+                }
+            } catch (e) {}
+            return Math.random();
+        }
+        function gzSecureInt(n) { return Math.floor(gzSecureRandom() * n); }
         const FK_ITEMS = ['🇧🇩','🇧🇷','🇯🇵','🇮🇷','🇸🇪','🇹🇻','🇵🇰'];
         const FK_SYMBOL_VALUES = {'🇧🇩':1.2,'🇧🇷':2.0,'🇯🇵':1.0,'🇮🇷':0.8,'🇸🇪':0.6,'🇹🇻':1.5,'🇵🇰':0.5};
         let FK_BET_OPTIONS = [1.00, 2.00, 3.00, 5.00, 10.00];
@@ -3955,7 +3969,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 const cell = document.createElement('div');
                 cell.className = 'fk-slot-cell';
                 cell.id = `fk-cell-${i}`;
-                const randomItem = FK_ITEMS[Math.floor(Math.random() * FK_ITEMS.length)];
+                const randomItem = FK_ITEMS[gzSecureInt(FK_ITEMS.length)];
                 cell.innerText = randomItem;
                 fkBoardState[i] = randomItem;
                 fkBoardContainer.appendChild(cell);
@@ -4073,7 +4087,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
             const spinInterval = setInterval(() => {
                 playFkSound('spin'); 
                 for (let i = 0; i < 25; i++) {
-                    const randSym = FK_ITEMS[Math.floor(Math.random() * FK_ITEMS.length)];
+                    const randSym = FK_ITEMS[gzSecureInt(FK_ITEMS.length)];
                     fkBoardState[i] = randSym;
                     document.getElementById(`fk-cell-${i}`).innerText = randSym;
                 }
@@ -4190,7 +4204,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                         const emptyCount = 5 - existingSymbolsInCol.length;
                         const newSymbols = [];
                         for (let k = 0; k < emptyCount; k++) {
-                            newSymbols.push(FK_ITEMS[Math.floor(Math.random() * FK_ITEMS.length)]);
+                            newSymbols.push(FK_ITEMS[gzSecureInt(FK_ITEMS.length)]);
                         }
 
                         const fullColSymbols = newSymbols.concat(existingSymbolsInCol);
