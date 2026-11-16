@@ -2822,8 +2822,9 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         });
 
         // New-member welcome bonus. It goes into the normal Bonus Box (claim -> main balance, bonus turnover applies).
-        const REGISTER_BONUS_AMOUNT = 60;   // set 0 to switch the registration bonus off
-        const REGISTER_BONUS_HOURS = 24;    // how long the new member has to claim it
+        // Defaults only. The admin dashboard (Users page → Registration Bonus) controls amount, on/off and claim time.
+        const REGISTER_BONUS_AMOUNT = 60;
+        const REGISTER_BONUS_HOURS = 24;
 
         function gzNormMobile(s) {
             let d = String(s || '').replace(/[^0-9]/g, '');
@@ -2832,6 +2833,12 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
         }
         // Creates the account, the ৳60 welcome bonus and the wallet numbers (bKash / Nagad). One number may belong to one account only.
         async function gzSignUp(email, password, numbers) {
+            // While signing up, the "create a blank user record" fallback in the login listener must stay quiet.
+            window.gzSigningUp = true;
+            try { return await gzSignUpInner(email, password, numbers); }
+            finally { setTimeout(function() { window.gzSigningUp = false; }, 2000); }
+        }
+        async function gzSignUpInner(email, password, numbers) {
             const wanted = numbers;   // [['bkash','017…'], …]  at least one
             const takenMsg = n => 'এই নম্বর (' + n + ') আগেই অন্য অ্যাকাউন্টে ব্যবহার করা হয়েছে।';
             for (const w of wanted) {   // friendly early check, before the account exists
@@ -2839,18 +2846,29 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                 try { taken = (await db.ref('walletIndex/' + w[1]).once('value')).val(); } catch (e) {}
                 if (taken) throw new Error(takenMsg(w[1]));
             }
+            // Registration bonus: amount / on-off / claim time are set by the admin (config/registrationBonus).
+            let regBonus = { enabled: true, amount: REGISTER_BONUS_AMOUNT, hours: REGISTER_BONUS_HOURS };
+            try {
+                const c = (await db.ref('config/registrationBonus').once('value')).val();
+                if (c) {
+                    regBonus.enabled = c.enabled !== false;
+                    const amt = Number(c.amount), hrs = Number(c.hours);
+                    if (Number.isFinite(amt) && amt >= 0) regBonus.amount = amt;
+                    if (Number.isFinite(hrs) && hrs > 0) regBonus.hours = hrs;
+                }
+            } catch (e) { console.warn('Registration bonus setting could not be read; using the default.', e); }
             const cred = await auth.createUserWithEmailAndPassword(email, password);
             const uid = cred.user.uid, now = Date.now(), reserved = [];
             const userData = {
                 email, phone: wanted[0][1], phoneNumber: wanted[0][1], balance: 0, games: 0, wins: 0,
                 boxingKingGames: 0, boxingKingWins: 0, createdAt: now
             };
-            if (REGISTER_BONUS_AMOUNT > 0) {
+            if (regBonus.enabled && regBonus.amount > 0) {
                 const bonusId = db.ref('users/' + uid + '/bonuses').push().key;
                 userData.bonuses = {};
                 userData.bonuses[bonusId] = {
-                    title: 'Registration bonus', amount: REGISTER_BONUS_AMOUNT,
-                    createdAt: now, expiresAt: now + REGISTER_BONUS_HOURS * 60 * 60 * 1000,
+                    title: 'Registration bonus', amount: regBonus.amount,
+                    createdAt: now, expiresAt: now + regBonus.hours * 60 * 60 * 1000,
                     status: 'pending', grantedBy: 'system'
                 };
             }
@@ -3012,7 +3030,7 @@ body{background:radial-gradient(ellipse at top,#14736b 0,#064748 48%,#032e39 100
                     if (data) {
                         currentBalance = data.balance || 0;
                         updateSharedBalanceUI();
-                    } else {
+                    } else if (!window.gzSigningUp) {
                         db.ref('users/' + user.uid).update({
                             email: user.email, balance: 0, games: 0, wins: 0,
                             boxingKingGames: 0, boxingKingWins: 0
